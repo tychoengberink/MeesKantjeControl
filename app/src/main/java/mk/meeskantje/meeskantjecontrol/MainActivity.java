@@ -440,6 +440,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     public void test(){
-        System.out.println("test");
+        System.out.println("test2");
     }
 }
