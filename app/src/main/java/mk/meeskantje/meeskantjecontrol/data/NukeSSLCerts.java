@@ -10,12 +10,6 @@ import javax.net.ssl.SSLSession;
 import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 
-/**
- * This class can be found at:
- * https://newfivefour.com/android-trust-all-ssl-certificates.html
- *
- * DONT USE FOR PRODUCTION!!!
- */
 
 public class NukeSSLCerts {
     protected static final String TAG = "NukeSSLCerts";

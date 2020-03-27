@@ -222,7 +222,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         sendText.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                byte[] bytes = messageInput.toString().getBytes(Charset.defaultCharset());
+                byte[] bytes = messageInput.getText().toString().getBytes(Charset.defaultCharset());
                 connectionService.write(bytes);
             }
         });
@@ -401,7 +401,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             registerReceiver(broadcastReceiverThird, discoverDevicesIntent);
         }
 
-        if (bluetoothAdapter.isDiscovering()) {
+        if (!bluetoothAdapter.isDiscovering()) {
             checkPermissions();
 
             bluetoothAdapter.startDiscovery();
@@ -436,10 +436,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     public void startBluetoothConnection(View view) {
-        connectionService.startClient(mainDevice, MY_UUID_INSECURE);
-    }
-
-    public void test(){
-        System.out.println("test2");
+        connectionService.startClient(mainDevice);
     }
 }

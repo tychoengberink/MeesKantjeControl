@@ -6,6 +6,7 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
 import android.content.Context;
+import android.util.Log;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -13,21 +14,21 @@ import java.io.OutputStream;
 import java.nio.charset.Charset;
 import java.util.UUID;
 
+import static android.provider.Settings.NameValueTable.NAME;
+
 public class ConnectionService {
     private static final String TAG = "BluetoothService";
-    private static final String appName = "MYAPP";
-
-    private static final UUID MY_UUID_INSECURE =  UUID.fromString("8ce255c0-200a-11e0-ac64-08002000c9a66");
+    private static final UUID MY_UUID =  UUID.fromString("8ce255c0-200a-11e0-ac64-08002000c9a66");
+    private static final UUID DEFAULT_SPP_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
 
     private final BluetoothAdapter mBlueToothAd;
-    private BluetoothDevice device;
-    private UUID deviceUUID;
+
     private ConnectThread mConnectThread;
     private AcceptThread mAcceptThread;
+    private ConnectedThread manageMyConnectedSocket;
     ProgressDialog dialog;
     Context context;
 
-    private ConnectedThread mConnectedThread;
 
     public ConnectionService(Context context) {
         this.context = context;
@@ -39,67 +40,83 @@ public class ConnectionService {
         private final BluetoothServerSocket mmServerSocket;
 
         public AcceptThread() throws IOException {
-            this.mmServerSocket = null;
+            BluetoothServerSocket tmp = null;
+            try {
+                // MY_UUID is the app's UUID string, also used by the client code.
+                tmp = mBlueToothAd.listenUsingRfcommWithServiceRecord(NAME, MY_UUID);
 
-            mBlueToothAd.listenUsingInsecureRfcommWithServiceRecord(appName, MY_UUID_INSECURE);
-
-
+            } catch (IOException e) {
+                Log.e(TAG, "Socket's listen() method failed", e);
+            }
+            mmServerSocket = tmp;
         }
 
         public void run() {
             BluetoothSocket socket = null;
+            // Keep listening until exception occurs or a socket is returned.
+            while (true) {
+                try {
+                    socket = mmServerSocket.accept();
+                } catch (IOException e) {
+                    Log.e(TAG, "Socket's accept() method failed", e);
+                    break;
+                }
 
-            try {
-                socket = mmServerSocket.accept();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
+                if (socket != null) {
+                    // A connection was accepted. Perform work associated with
+                    // the connection in a separate thread.
 
-        public void cancel() {
-            try {
-                mmServerSocket.close();
-            } catch (IOException e) {
-                e.printStackTrace();
+                    if (manageMyConnectedSocket == null) {
+                            manageMyConnectedSocket = new ConnectedThread(socket);
+                        manageMyConnectedSocket.start();
+                    }
+                try {
+                    mmServerSocket.close();
+                } catch ( IOException e) {
+                    e.printStackTrace();
+                }
+                    break;
+                }
             }
         }
     }
 
     private class ConnectThread extends Thread {
         private BluetoothSocket connectSocket;
+        private BluetoothDevice device;
 
-        public ConnectThread (BluetoothDevice cDevice, UUID uuid) {
+
+        public ConnectThread (BluetoothDevice cDevice) {
             device = cDevice;
-            deviceUUID = uuid;
-        }
-
-        public void run() {
+            System.out.println(device);
             BluetoothSocket tmp = null;
 
             try {
-                tmp = device.createRfcommSocketToServiceRecord(deviceUUID);
+                tmp = device.createInsecureRfcommSocketToServiceRecord(DEFAULT_SPP_UUID);
             } catch (IOException e) {
                 e.printStackTrace();
             }
 
-            this.connectSocket = tmp;
+            connectSocket = tmp;
+        }
 
+        public void run() {
             mBlueToothAd.cancelDiscovery();
 
             try {
-                this.connectSocket.connect();
+                connectSocket.connect();
             } catch (IOException e) {
                 e.printStackTrace();
 
                 try {
-                    this.connectSocket.close();
+                    connectSocket.close();
                 } catch (IOException ex) {
                     ex.printStackTrace();
                 }
             }
 
-            connected(this.connectSocket, device);
-
+            manageMyConnectedSocket = new ConnectedThread(connectSocket);
+            manageMyConnectedSocket.start();
 
         }
 
@@ -128,10 +145,10 @@ public class ConnectionService {
         }
     }
 
-    public void startClient(BluetoothDevice device, UUID uuid) {
+    public void startClient(BluetoothDevice device) {
         dialog = ProgressDialog.show(context, "Connecting bluetooth", "Loading...", true);
 
-        mConnectThread = new ConnectThread(device, uuid);
+        mConnectThread = new ConnectThread(device);
         mConnectThread.start();
     }
 
@@ -169,7 +186,7 @@ public class ConnectionService {
             int bytes;
 
             while (true) {
-
+                System.out.println("RUNNING");
                 try {
                     bytes = mmInStream.read(buffer);
                     String incoming = new String(buffer, 0, bytes);
@@ -198,16 +215,7 @@ public class ConnectionService {
         }
     }
 
-    private void connected(BluetoothSocket connectSocket, BluetoothDevice device) {
-        mConnectedThread = new ConnectedThread(connectSocket);
-        mConnectedThread.start();
-
-
-    }
-
     public void write (byte[] out) {
-        ConnectedThread thread;
-
-        mConnectedThread.write(out);
+        manageMyConnectedSocket.write(out);
     }
 }
