@@ -28,8 +28,9 @@
         android:layout_width="409dp"
         android:layout_height="324dp"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/message_input" />
+        app:layout_constraintTop_toBottomOf="@+id/receiving_info" />
 
     <Button
         android:id="@+id/discover_sec"
@@ -49,22 +50,36 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/onOffButton" />
 
-    <EditText
-        android:id="@+id/message_input"
+    <TextView
+        android:id="@+id/sending"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:ems="10"
-        android:hint="Message"
-        android:inputType="textPersonName"
+        android:text="Sending:"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/start_connection" />
 
-    <Button
-        android:id="@+id/send"
+    <TextView
+        android:id="@+id/sending_info"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="send"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintTop_toTopOf="@+id/message_input" />
+        android:text="TextView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/sending" />
+
+    <TextView
+        android:id="@+id/receiving"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Receiving:"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/sending_info" />
+
+    <TextView
+        android:id="@+id/receiving_info"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="TextView"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/receiving" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

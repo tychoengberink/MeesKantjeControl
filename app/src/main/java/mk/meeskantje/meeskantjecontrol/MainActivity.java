@@ -34,6 +34,7 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import java.nio.charset.Charset;
 import java.util.ArrayList;
@@ -61,8 +62,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     Button onOffButton;
     Button discoverable;
     Button startButton;
-    Button sendText;
-    EditText messageInput;
+    TextView sendindData;
+    TextView receivingData;
 
     private DataProvider dataProvider;
     private List<Coordinate> listCoordinate;
@@ -199,8 +200,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         onOffButton = findViewById(R.id.onOffButton);
         discoverable = findViewById(R.id.discover);
         startButton = findViewById(R.id.start_connection);
-        sendText = findViewById(R.id.send);
-        messageInput = findViewById(R.id.message_input);
+
+        sendindData = findViewById(R.id.sending_info);
+        receivingData = findViewById(R.id.receiving_info);
 
         devices = new ArrayList<>();
         deviceList = findViewById(R.id.device_list);
@@ -216,14 +218,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             @Override
             public void onClick(View view) {
                 bluetoothSwitch();
-            }
-        });
-
-        sendText.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                byte[] bytes = messageInput.getText().toString().getBytes(Charset.defaultCharset());
-                connectionService.write(bytes);
             }
         });
 
