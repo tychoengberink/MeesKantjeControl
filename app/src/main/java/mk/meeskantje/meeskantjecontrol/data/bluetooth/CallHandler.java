@@ -7,6 +7,7 @@ import com.android.volley.VolleyError;
 import org.json.JSONObject;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
@@ -19,12 +20,14 @@ public class CallHandler extends Thread {
     private JSONObject jsonObject;
     private DataProvider dataProvider;
     private OutputStream outStream;
+    private InputStream inStream;
     private ArrayList<?> oldDrones, oldCountries, oldSensors, oldCoords, oldSensorLogs;
 
-    public CallHandler(JSONObject data, Context context, OutputStream outStream) {
+    public CallHandler(JSONObject data, Context context, OutputStream outStream, InputStream inStream) {
         this.jsonObject = data;
         this.dataProvider = new DataProvider(context);
         this.outStream = outStream;
+        this.inStream = inStream;
 
         this.oldCoords = null;
         this.oldCountries = null;
@@ -59,6 +62,7 @@ public class CallHandler extends Thread {
             public void response(ArrayList<?> data) {
                 System.out.println("GET_DRONES " + data);
                 checkForChanges(oldDrones, data);
+                oldDrones = data;
             }
 
             @Override
@@ -74,6 +78,7 @@ public class CallHandler extends Thread {
             public void response(ArrayList<?> data) {
                 System.out.println("GET_COORDINATES " + data);
                 checkForChanges(oldCoords, data);
+                oldCoords = data;
             }
 
             @Override
@@ -89,6 +94,7 @@ public class CallHandler extends Thread {
             public void response(ArrayList<?> data) {
                 System.out.println("GET_SENSORS " + data);
                 checkForChanges(oldSensors, data);
+                oldSensors = data;
             }
 
             @Override
@@ -104,6 +110,7 @@ public class CallHandler extends Thread {
             public void response(ArrayList<?> data) {
                 System.out.println("GET_COUNTRIES " + data);
                 checkForChanges(oldCountries, data);
+                oldCountries = data;
             }
 
             @Override
@@ -119,6 +126,7 @@ public class CallHandler extends Thread {
             public void response(ArrayList<?> data) {
                 System.out.println("GET_SENSORLOGS " + data);
                 checkForChanges(oldSensorLogs, data);
+                oldSensorLogs = data;
             }
 
             @Override
