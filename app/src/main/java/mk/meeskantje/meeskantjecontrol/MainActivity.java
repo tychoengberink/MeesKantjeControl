@@ -13,22 +13,8 @@ import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 
-import com.android.volley.VolleyError;
-
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
 
-import android.Manifest;
-import android.bluetooth.BluetoothAdapter;
-import android.bluetooth.BluetoothDevice;
-import android.content.BroadcastReceiver;
-import android.content.Context;
-import android.content.Intent;
-import android.content.IntentFilter;
-import android.os.Build;
-import android.os.Bundle;
-import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
@@ -36,24 +22,12 @@ import android.widget.EditText;
 import android.widget.ListView;
 
 import java.nio.charset.Charset;
-import java.util.ArrayList;
 import java.util.UUID;
 
+import mk.meeskantje.meeskantjecontrol.data.UDP.UDPClient;
+import mk.meeskantje.meeskantjecontrol.data.UDP.UDPServer;
 import mk.meeskantje.meeskantjecontrol.data.bluetooth.ConnectionService;
 import mk.meeskantje.meeskantjecontrol.data.bluetooth.DeviceListAdapter;
-
-import mk.meeskantje.meeskantjecontrol.data.DataProvider;
-import mk.meeskantje.meeskantjecontrol.data.response.ArrayListResponse;
-import mk.meeskantje.meeskantjecontrol.data.response.CoordinateResponse;
-import mk.meeskantje.meeskantjecontrol.data.response.CountryResponse;
-import mk.meeskantje.meeskantjecontrol.data.response.DroneResponse;
-import mk.meeskantje.meeskantjecontrol.data.response.SensorLogResponse;
-import mk.meeskantje.meeskantjecontrol.data.response.SensorResponse;
-import mk.meeskantje.meeskantjecontrol.model.Coordinate;
-import mk.meeskantje.meeskantjecontrol.model.Country;
-import mk.meeskantje.meeskantjecontrol.model.Drone;
-import mk.meeskantje.meeskantjecontrol.model.Sensor;
-import mk.meeskantje.meeskantjecontrol.model.SensorLog;
 
 
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemClickListener {
@@ -64,12 +38,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     Button sendText;
     EditText messageInput;
 
-    private DataProvider dataProvider;
-    private List<Coordinate> listCoordinate;
-    private List<Country> listCountry;
-    private List<Drone> listDrone;
-    private List<Sensor> listSensor;
-    private List<SensorLog> listSensorLog;
+    private UDPClient dataProvider;
+    private UDPServer dataSender;
 
     private static final String TAG = "MainActivity";
     public ArrayList<BluetoothDevice> devices;
@@ -188,14 +158,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        dataProvider = new DataProvider(this);
-
-        listCoordinate = new ArrayList<>();
-        listCountry = new ArrayList<>();
-        listDrone = new ArrayList<>();
-        listSensor = new ArrayList<>();
-        listSensorLog = new ArrayList<>();
-
         onOffButton = findViewById(R.id.onOffButton);
         discoverable = findViewById(R.id.discover);
         startButton = findViewById(R.id.start_connection);
@@ -227,136 +189,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             }
         });
 
-
-        HashMap<String, String> parametersCountry = new HashMap<String, String>();
-        parametersCountry.put("id", "1");
-        dataProvider.request(DataProvider.GET_COUNTRY, parametersCountry, new CountryResponse() {
-            @Override
-            public void response(Country data) {
-                System.out.println("GET_COUNTRY " + data);
-            }
-
-            @Override
-            public void error(VolleyError error) {
-                System.out.println(error);
-            }
-        });
-
-        dataProvider.request(DataProvider.GET_COUNTRIES, null, new ArrayListResponse() {
-            @Override
-            public void response(ArrayList<?> data) {
-                System.out.println("GET_COUNTRIES " + data);
-            }
-
-            @Override
-            public void error(VolleyError error) {
-                System.out.println(error);
-            }
-        });
-
-        HashMap<String, String> parametersCoordinates = new HashMap<String, String>();
-        parametersCoordinates.put("id", "1");
-        dataProvider.request(DataProvider.GET_COORDINATE, parametersCoordinates, new CoordinateResponse() {
-            @Override
-            public void response(Coordinate data) {
-                System.out.println("GET_COORDINATE " + data);
-            }
-
-            @Override
-            public void error(VolleyError error) {
-                System.out.println(error);
-            }
-        });
-
-        dataProvider.request(DataProvider.GET_COORDINATES, null, new ArrayListResponse() {
-            @Override
-            public void response(ArrayList<?> data) {
-                System.out.println("GET_COORDINATES " + data);
-            }
-
-            @Override
-            public void error(VolleyError error) {
-                System.out.println(error);
-            }
-        });
-
-        HashMap<String, String> parametersDrones = new HashMap<String, String>();
-        parametersDrones.put("id", "1");
-        dataProvider.request(DataProvider.GET_DRONE, parametersDrones, new DroneResponse() {
-            @Override
-            public void response(Drone data) {
-                System.out.println("GET_DRONE " + data);
-            }
-
-            @Override
-            public void error(VolleyError error) {
-                System.out.println(error);
-            }
-        });
-
-        dataProvider.request(DataProvider.GET_DRONES, null, new ArrayListResponse() {
-            @Override
-            public void response(ArrayList<?> data) {
-                System.out.println("GET_DRONES " + data);
-            }
-
-            @Override
-            public void error(VolleyError error) {
-                System.out.println(error);
-            }
-        });
-
-        HashMap<String, String> parametersSensor = new HashMap<String, String>();
-        parametersSensor.put("id", "1");
-        dataProvider.request(DataProvider.GET_SENSOR, parametersSensor, new SensorResponse() {
-            @Override
-            public void response(Sensor data) {
-                System.out.println("GET_SENSOR " + data);
-            }
-
-            @Override
-            public void error(VolleyError error) {
-                System.out.println(error);
-            }
-        });
-
-        dataProvider.request(DataProvider.GET_SENSORS, null, new ArrayListResponse() {
-            @Override
-            public void response(ArrayList<?> data) {
-                System.out.println("GET_SENSORS " + data);
-            }
-
-            @Override
-            public void error(VolleyError error) {
-                System.out.println(error);
-            }
-        });
-
-        HashMap<String, String> parameterssensorLogs = new HashMap<String, String>();
-        parameterssensorLogs.put("id", "1");
-        dataProvider.request(DataProvider.GET_SENSORLOG, parameterssensorLogs, new SensorLogResponse() {
-            @Override
-            public void response(SensorLog data) {
-                System.out.println("GET_SENSORLOG " + data);
-            }
-
-            @Override
-            public void error(VolleyError error) {
-                System.out.println(error);
-            }
-        });
-
-        dataProvider.request(DataProvider.GET_SENSORLOGS, null, new ArrayListResponse() {
-            @Override
-            public void response(ArrayList<?> data) {
-                System.out.println("GET_SENSORLOGS " + data);
-            }
-
-            @Override
-            public void error(VolleyError error) {
-                System.out.println(error);
-            }
-        });
     }
 
     public void bluetoothSwitch() {
@@ -437,5 +269,29 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     public void startBluetoothConnection(View view) {
         connectionService.startClient(mainDevice);
+    }
+
+    protected void onResume() {
+//        dataProvider = new UDPClient();
+//        dataProvider.start();
+        dataSender = new UDPServer();
+        dataSender.start();
+        super.onResume();
+    }
+
+    protected void onPause() {
+        dataSender.kill();
+//        dataProvider.kill();
+        super.onPause();
+    }
+
+
+
+    @Override
+    protected void onStop() {
+        dataSender.kill();
+//        dataProvider.kill();
+
+        super.onStop();
     }
 }
