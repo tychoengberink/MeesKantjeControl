@@ -62,7 +62,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     Button onOffButton;
     Button discoverable;
     Button startButton;
-    TextView sendindData;
+    TextView sendingData;
     TextView receivingData;
 
     private DataProvider dataProvider;
@@ -201,7 +201,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         discoverable = findViewById(R.id.discover);
         startButton = findViewById(R.id.start_connection);
 
-        sendindData = findViewById(R.id.sending_info);
+        sendingData = findViewById(R.id.sending_info);
         receivingData = findViewById(R.id.receiving_info);
 
         devices = new ArrayList<>();
@@ -431,5 +431,13 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     public void startBluetoothConnection(View view) {
         connectionService.startClient(mainDevice);
+    }
+
+    public void setReceivedData(String data) {
+        receivingData.setText(data);
+    }
+
+    public void setSendingData(String data) {
+        sendingData.setText(data);
     }
 }

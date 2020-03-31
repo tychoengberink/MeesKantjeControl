@@ -8,6 +8,9 @@ import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 import android.util.Log;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -184,13 +187,21 @@ public class ConnectionService {
         public void run() {
             byte[] buffer = new byte[1024];
 
-            int bytes;
+            int bytes = 0;
 
             while (true) {
                 System.out.println("RUNNING");
                 try {
-                    bytes = mmInStream.read(buffer);
+
+                    bytes = mmInStream.read(buffer, bytes, 1024 - bytes);
                     String incoming = new String(buffer, 0, bytes);
+
+                    try {
+                        JSONObject jsonObject = new JSONObject(incoming);
+                    } catch (JSONException e) {
+                        e.printStackTrace();
+                    }
+
                 } catch (IOException e) {
                     e.printStackTrace();
                     break;
@@ -216,7 +227,7 @@ public class ConnectionService {
         }
     }
 
-    public void write (byte[] out) {
-        manageMyConnectedSocket.write(out);
+    public void write (String data) {
+        manageMyConnectedSocket.write(data.getBytes());
     }
 }
