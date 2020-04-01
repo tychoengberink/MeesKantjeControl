@@ -1,25 +1,34 @@
 package mk.meeskantje.meeskantjecontrol.data.UDP;
 
+import android.widget.TextView;
+
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 
 public class UDPClient extends Thread {
-      private boolean bKeepRunning = true;
+    private boolean bKeepRunning = true;
     private String lastMessage = "";
     private  DatagramSocket socket = null;
+    private UDPServer server;
+
+    public UDPClient(UDPServer server) {
+        this.server = server;
+    }
 
     public void run() {
         System.out.println("Listener started");
         String message;
-        byte[] lmessage = new byte[256];
-        DatagramPacket packet = new DatagramPacket(lmessage, lmessage.length);
+        byte[] lMessage = new byte[256];
+        DatagramPacket packet = new DatagramPacket(lMessage, lMessage.length);
 
         try {
             DatagramSocket socket = new DatagramSocket(33333);
 
             while(bKeepRunning) {
                 socket.receive(packet);
-                message = new String(lmessage, 0, packet.getLength());
+                this.server.addQueue(packet);
+
+                message = new String(lMessage, 0, packet.getLength());
                 lastMessage = message;
                 System.out.println(message);
             }

@@ -1,17 +1,27 @@
 package mk.meeskantje.meeskantjecontrol.data.UDP;
 
+import android.widget.TextView;
+
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 import java.util.ArrayList;
 
+import mk.meeskantje.meeskantjecontrol.data.bluetooth.ConnectionService;
+
 public class UDPServer extends Thread {
     DatagramSocket socket;
     boolean running;
-    private byte[] buf = null;
-    private ArrayList<byte[]> queue;
 
+//    private byte[] buf = null; TODO remove
+
+    private ArrayList<DatagramPacket> queue;
+    private ConnectionService service;
+
+    public UDPServer(ConnectionService service) {
+        this.service = service;
+    }
 
     public void setRunning(boolean running){
         this.running = running;
@@ -22,22 +32,28 @@ public class UDPServer extends Thread {
 
         queue = new ArrayList<>();
         running = true;
+        byte[] lMessage = new byte[256];
 
         try {
-            socket = new DatagramSocket(33333);
-
+            socket = new DatagramSocket(33334);
 
             while(running){
-//                byte[] buf ="Hello World!".getBytes();
-                setBuf();
-                if (this.buf != null) {
-                    DatagramPacket packet = null;
-                    InetAddress addres = InetAddress.getByName("192.168.1.107");
-                    int port = 33333;
-                    packet = new DatagramPacket(this.buf, this.buf.length, addres, port);
+                if (this.queue.size() > 0) {
+                    System.out.println("sending");
+                    DatagramPacket packet = this.queue.get(0);
 
-                    socket.send(packet);
-                    this.buf = null;
+//                    InetAddress address = InetAddress.getByName("192.168.178.20"); TODO remove
+
+                    String message = new String(lMessage, 0, packet.getLength());
+                    this.service.write(message.getBytes());
+
+//                    int port = 33334; TODO remove
+//                    packet.setAddress(address);
+//                    packet.setPort(port);
+
+//                    socket.send(packet); TODO remove
+//                    this.buf = null;
+                    this.queue.remove(0);
 
                     //TODO add timer if needed
                 }
@@ -53,14 +69,8 @@ public class UDPServer extends Thread {
         running = false;
     }
 
-    public void setBuf() {
-        if (this.queue.size() > 0) {
-            this.buf = this.queue.get(0);
-            this.queue.remove(0);
-        }
-    }
-
-    public void addQueue(byte[] message) {
-        this.queue.add(message);
+    public void addQueue(DatagramPacket packet) {
+        System.out.println("add queue");
+        this.queue.add(packet);
     }
 }

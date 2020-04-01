@@ -20,6 +20,7 @@ import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
+import android.widget.TextView;
 
 import java.nio.charset.Charset;
 import java.util.UUID;
@@ -35,8 +36,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     Button onOffButton;
     Button discoverable;
     Button startButton;
-    Button sendText;
-    EditText messageInput;
+    TextView dataView;
 
     private UDPClient dataProvider;
     private UDPServer dataSender;
@@ -161,8 +161,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         onOffButton = findViewById(R.id.onOffButton);
         discoverable = findViewById(R.id.discover);
         startButton = findViewById(R.id.start_connection);
-        sendText = findViewById(R.id.send);
-        messageInput = findViewById(R.id.message_input);
 
         devices = new ArrayList<>();
         deviceList = findViewById(R.id.device_list);
@@ -178,14 +176,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             @Override
             public void onClick(View view) {
                 bluetoothSwitch();
-            }
-        });
-
-        sendText.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                byte[] bytes = messageInput.getText().toString().getBytes(Charset.defaultCharset());
-                connectionService.write(bytes);
             }
         });
 
@@ -269,19 +259,19 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     public void startBluetoothConnection(View view) {
         connectionService.startClient(mainDevice);
+        dataSender.start();
     }
 
     protected void onResume() {
-//        dataProvider = new UDPClient();
-//        dataProvider.start();
-        dataSender = new UDPServer();
-        dataSender.start();
+        dataSender = new UDPServer(connectionService);
+        dataProvider = new UDPClient(dataSender);
+        dataProvider.start();
         super.onResume();
     }
 
     protected void onPause() {
         dataSender.kill();
-//        dataProvider.kill();
+        dataProvider.kill();
         super.onPause();
     }
 
@@ -290,7 +280,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     @Override
     protected void onStop() {
         dataSender.kill();
-//        dataProvider.kill();
+        dataProvider.kill();
 
         super.onStop();
     }
