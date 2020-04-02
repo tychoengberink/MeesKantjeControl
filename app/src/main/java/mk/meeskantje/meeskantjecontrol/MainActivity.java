@@ -18,11 +18,8 @@ import java.util.ArrayList;
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.TextView;
 
-import java.nio.charset.Charset;
 import java.util.UUID;
 
 import mk.meeskantje.meeskantjecontrol.data.UDP.UDPClient;
@@ -36,7 +33,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     Button onOffButton;
     Button discoverable;
     Button startButton;
-    TextView dataView;
 
     private UDPClient dataProvider;
     private UDPServer dataSender;

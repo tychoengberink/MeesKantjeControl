@@ -35,7 +35,7 @@ public class UDPServer extends Thread {
         byte[] lMessage = new byte[256];
 
         try {
-            socket = new DatagramSocket(33334);
+//            socket = new DatagramSocket(33334); TODO remove
 
             while(running){
                 if (this.queue.size() > 0) {
