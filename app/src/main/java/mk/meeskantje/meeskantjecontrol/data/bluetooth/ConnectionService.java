@@ -14,6 +14,7 @@ import java.io.OutputStream;
 import java.net.DatagramPacket;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import static android.provider.Settings.NameValueTable.NAME;
@@ -32,6 +33,7 @@ public class ConnectionService {
     private ConnectThread mConnectThread;
     private AcceptThread mAcceptThread;
     private ConnectedThread manageMyConnectedSocket;
+    private BluetoothConnector connector;
     ProgressDialog dialog;
     Context context;
 
@@ -110,9 +112,14 @@ public class ConnectionService {
         public void run() {
             mBlueToothAd.cancelDiscovery();
 
+            List<UUID> tmp = new ArrayList<>();
+            tmp.add(DEFAULT_SPP_UUID);
+            connector = new BluetoothConnector(device, true, mBlueToothAd, tmp);
+
             try {
                 System.out.println("connecting");
-                connectSocket.connect();
+//                connectSocket.connect();
+                connector.connect();
             } catch (IOException e) {
                 System.out.println("error");
                 e.printStackTrace();
