@@ -278,7 +278,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     public void startBluetoothConnection(View view) {
         System.out.println("starting Client");
         connectionService.startClient(mainDevice);
-        dataSender.start();
     }
 
     protected void onResume() {

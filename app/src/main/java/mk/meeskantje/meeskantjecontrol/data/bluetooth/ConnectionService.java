@@ -187,6 +187,8 @@ public class ConnectionService {
             }
 
             try {
+                System.out.println("SOCKET: " + mmSocket.toString());
+                System.out.println("QUEUE: " + queue.getPackets().size());
                 tmpIn = mmSocket.getInputStream();
                 tmpOut = mmSocket.getOutputStream();
             } catch (IOException e) {
@@ -215,7 +217,7 @@ public class ConnectionService {
 //                    break;
 //                }
 
-                if (queue.getQueueLength() > 0 && !paused) {
+                if (queue.getQueueLength() > 0 && !paused && mmOutStream != null) {
                     System.out.println("Sending");
                     DatagramPacket packet = queue.getNextPacket();
                     write(new String(lMessage, 0, packet.getLength()).getBytes());
@@ -224,8 +226,9 @@ public class ConnectionService {
         }
 
         public void write (byte[] bytes) {
-            String text = new String(bytes, Charset.defaultCharset());
             try {
+                System.out.println("OS: " + mmOutStream.toString());
+                System.out.println("AR: " + bytes.toString());
                 mmOutStream.write(bytes);
             } catch (IOException e) {
                 e.printStackTrace();
