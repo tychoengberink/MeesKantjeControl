@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.Manifest;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothGatt;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -59,9 +60,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 switch (state) {
                     case BluetoothAdapter.STATE_OFF:
                         Log.d(TAG, "onReceive: STATE OFF");
+                        connectionService.pauseSender();
                         break;
                     case BluetoothAdapter.STATE_TURNING_OFF:
                         Log.d(TAG, "onReceive: STATE TURNING OFF");
+                        connectionService.pauseSender();
                         break;
                     case BluetoothAdapter.STATE_ON:
                         Log.d(TAG, "onReceive: STATE ON");
@@ -111,6 +114,18 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 Log.d(TAG, "onReceiveThird: " + device.getName() + ": " + device.getAddress());
                 deviceListAdapter = new DeviceListAdapter(context, R.layout.device_adapter_view, devices);
                 deviceList.setAdapter(deviceListAdapter);
+            }
+            else if (BluetoothDevice.ACTION_ACL_CONNECTED.equals(action)) {
+                Log.d(TAG, "onReceiveThird: Connected.");
+            }
+            else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
+                Log.d(TAG, "onReceiveThird: Discovery finished.");
+            }
+            else if (BluetoothDevice.ACTION_ACL_DISCONNECT_REQUESTED.equals(action)) {
+                Log.d(TAG, "onReceiveThird: Requested disconnection.");
+            }
+            else if (BluetoothDevice.ACTION_ACL_DISCONNECTED.equals(action)) {
+                Log.d(TAG, "onReceiveThird: Disconnected.");
             }
         }
     };
@@ -210,12 +225,17 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     public void btnDiscover(View view) {
         Log.d(TAG, "Looking for devices.");
 
+        this.devices.clear();
+
         if (bluetoothAdapter.isDiscovering()) {
             bluetoothAdapter.cancelDiscovery();
             Log.d(TAG, "Canceling discovery");
 
             bluetoothAdapter.startDiscovery();
             IntentFilter discoverDevicesIntent = new IntentFilter(BluetoothDevice.ACTION_FOUND);
+            discoverDevicesIntent.addAction(BluetoothDevice.ACTION_ACL_CONNECTED);
+            discoverDevicesIntent.addAction(BluetoothDevice.ACTION_ACL_DISCONNECT_REQUESTED);
+            discoverDevicesIntent.addAction(BluetoothDevice.ACTION_ACL_DISCONNECTED);
             registerReceiver(broadcastReceiverThird, discoverDevicesIntent);
         }
 
@@ -260,7 +280,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     protected void onResume() {
         dataSender = new UDPServer(connectionService);
-        dataProvider = new UDPClient(dataSender);
+        dataProvider = new UDPClient(connectionService);
         dataProvider.start();
         super.onResume();
     }

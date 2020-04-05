@@ -11,7 +11,9 @@ import android.util.Log;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.DatagramPacket;
 import java.nio.charset.Charset;
+import java.util.ArrayList;
 import java.util.UUID;
 
 import static android.provider.Settings.NameValueTable.NAME;
@@ -21,6 +23,9 @@ public class ConnectionService {
     private static final UUID MY_UUID =  UUID.fromString("8ce255c0-200a-11e0-ac64-08002000c9a66");
     private static final UUID DEFAULT_SPP_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
     private static final String test = "test";
+
+    private ArrayList<DatagramPacket> queue;
+    private boolean paused;
 
     private final BluetoothAdapter mBlueToothAd;
 
@@ -34,6 +39,7 @@ public class ConnectionService {
     public ConnectionService(Context context) {
         this.context = context;
         this.mBlueToothAd = BluetoothAdapter.getDefaultAdapter();
+        this.queue = new ArrayList<>();
         start();
     }
 
@@ -105,8 +111,10 @@ public class ConnectionService {
             mBlueToothAd.cancelDiscovery();
 
             try {
+                System.out.println("connecting");
                 connectSocket.connect();
             } catch (IOException e) {
+                System.out.println("error");
                 e.printStackTrace();
 
                 try {
@@ -183,8 +191,11 @@ public class ConnectionService {
 
         public void run() {
             byte[] buffer = new byte[1024];
+            byte[] lMessage = new byte[256];
 
             int bytes;
+
+            paused = false;
 
             while (true) {
                 System.out.println("RUNNING");
@@ -194,6 +205,11 @@ public class ConnectionService {
                 } catch (IOException e) {
                     e.printStackTrace();
                     break;
+                }
+
+                if (queue.size() > 0 && !paused) {
+                    DatagramPacket packet = queue.get(0);
+                    write(new String(lMessage, 0, packet.getLength()).getBytes());
                 }
             }
         }
@@ -218,5 +234,17 @@ public class ConnectionService {
 
     public void write (byte[] out) {
         manageMyConnectedSocket.write(out);
+    }
+
+    public void addQueue (DatagramPacket packet) {
+        this.queue.add(packet);
+    }
+
+    public void pauseSender() {
+        this.paused = true;
+    }
+
+    public void resumeSender() {
+        this.paused = false;
     }
 }

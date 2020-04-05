@@ -1,18 +1,18 @@
 package mk.meeskantje.meeskantjecontrol.data.UDP;
 
-import android.widget.TextView;
-
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+
+import mk.meeskantje.meeskantjecontrol.data.bluetooth.ConnectionService;
 
 public class UDPClient extends Thread {
     private boolean bKeepRunning = true;
     private String lastMessage = "";
     private  DatagramSocket socket = null;
-    private UDPServer server;
+    private ConnectionService service;
 
-    public UDPClient(UDPServer server) {
-        this.server = server;
+    public UDPClient(ConnectionService service) {
+        this.service = service;
     }
 
     public void run() {
@@ -26,7 +26,8 @@ public class UDPClient extends Thread {
 
             while(bKeepRunning) {
                 socket.receive(packet);
-                this.server.addQueue(packet);
+//                this.server.addQueue(packet);
+                this.service.addQueue(packet);
 
                 message = new String(lMessage, 0, packet.getLength());
                 lastMessage = message;
