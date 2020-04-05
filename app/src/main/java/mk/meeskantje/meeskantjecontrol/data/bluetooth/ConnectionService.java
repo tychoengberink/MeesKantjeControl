@@ -25,7 +25,7 @@ public class ConnectionService {
     private static final UUID DEFAULT_SPP_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
     private static final String test = "test";
 
-    private ArrayList<DatagramPacket> queue;
+    private PacketQueue queue;
     private boolean paused;
 
     private final BluetoothAdapter mBlueToothAd;
@@ -38,10 +38,10 @@ public class ConnectionService {
     Context context;
 
 
-    public ConnectionService(Context context) {
+    public ConnectionService(PacketQueue queue, Context context) {
         this.context = context;
         this.mBlueToothAd = BluetoothAdapter.getDefaultAdapter();
-        this.queue = new ArrayList<>();
+        this.queue = queue;
         start();
     }
 
@@ -215,9 +215,9 @@ public class ConnectionService {
 //                    break;
 //                }
 
-                if (queue.size() > 0 && !paused) {
+                if (queue.getQueueLength() > 0 && !paused) {
                     System.out.println("Sending");
-                    DatagramPacket packet = queue.get(0);
+                    DatagramPacket packet = queue.getNextPacket();
                     write(new String(lMessage, 0, packet.getLength()).getBytes());
                 }
             }
@@ -243,10 +243,6 @@ public class ConnectionService {
 
     public void write (byte[] out) {
         manageMyConnectedSocket.write(out);
-    }
-
-    public void addQueue (DatagramPacket packet) {
-        this.queue.add(packet);
     }
 
     public void pauseSender() {

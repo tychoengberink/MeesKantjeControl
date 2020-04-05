@@ -5,7 +5,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.Manifest;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
-import android.bluetooth.BluetoothGatt;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
@@ -27,6 +26,7 @@ import mk.meeskantje.meeskantjecontrol.data.UDP.UDPClient;
 import mk.meeskantje.meeskantjecontrol.data.UDP.UDPServer;
 import mk.meeskantje.meeskantjecontrol.data.bluetooth.ConnectionService;
 import mk.meeskantje.meeskantjecontrol.data.bluetooth.DeviceListAdapter;
+import mk.meeskantje.meeskantjecontrol.data.bluetooth.PacketQueue;
 
 
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemClickListener {
@@ -37,6 +37,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     private UDPClient dataProvider;
     private UDPServer dataSender;
+    private PacketQueue queue;
 
     private static final String TAG = "MainActivity";
     public ArrayList<BluetoothDevice> devices;
@@ -168,6 +169,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        queue = new PacketQueue();
+
         onOffButton = findViewById(R.id.onOffButton);
         discoverable = findViewById(R.id.discover);
         startButton = findViewById(R.id.start_connection);
@@ -268,7 +271,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             Log.d(TAG, "Trying to pair with " + devices.get(i).getName());
             devices.get(i).createBond();
             mainDevice = devices.get(i);
-            connectionService = new ConnectionService(this);
+            connectionService = new ConnectionService(queue, this);
         }
     }
 
@@ -280,7 +283,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     protected void onResume() {
         dataSender = new UDPServer(connectionService);
-        dataProvider = new UDPClient(connectionService);
+        dataProvider = new UDPClient(queue);
         dataProvider.start();
         super.onResume();
     }
