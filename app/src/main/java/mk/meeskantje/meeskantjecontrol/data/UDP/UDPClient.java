@@ -2,6 +2,7 @@ package mk.meeskantje.meeskantjecontrol.data.UDP;
 
 import java.net.DatagramPacket;
 import java.net.DatagramSocket;
+import java.net.InetSocketAddress;
 
 import mk.meeskantje.meeskantjecontrol.data.bluetooth.ConnectionService;
 
@@ -22,11 +23,18 @@ public class UDPClient extends Thread {
         DatagramPacket packet = new DatagramPacket(lMessage, lMessage.length);
 
         try {
-            DatagramSocket socket = new DatagramSocket(33333);
+            DatagramSocket socket = new DatagramSocket(null);
+            socket.setReuseAddress(true);
+            socket.setBroadcast(true);
+            socket.bind(new InetSocketAddress(33333));
+
 
             while(bKeepRunning) {
                 socket.receive(packet);
-                this.service.addQueue(packet);
+                System.out.println(service);
+                if (packet != null) {
+                    this.service.addQueue(packet);
+                }
 
                 message = new String(lMessage, 0, packet.getLength());
                 lastMessage = message;

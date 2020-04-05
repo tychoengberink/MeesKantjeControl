@@ -68,6 +68,7 @@ public class ConnectionService {
                     socket = mmServerSocket.accept();
                 } catch (IOException e) {
                     Log.e(TAG, "Socket's accept() method failed", e);
+                    pauseSender();
                     break;
                 }
 
@@ -197,6 +198,7 @@ public class ConnectionService {
         }
 
         public void run() {
+            System.out.println("starting sender");
             byte[] buffer = new byte[1024];
             byte[] lMessage = new byte[256];
 

@@ -1,20 +1,12 @@
 package mk.meeskantje.meeskantjecontrol.data.UDP;
 
-import android.widget.TextView;
-
 import java.net.DatagramPacket;
-import java.net.DatagramSocket;
-import java.net.InetAddress;
-import java.net.SocketException;
 import java.util.ArrayList;
 
 import mk.meeskantje.meeskantjecontrol.data.bluetooth.ConnectionService;
 
 public class UDPServer extends Thread {
-    DatagramSocket socket;
     boolean running;
-
-//    private byte[] buf = null; TODO remove
 
     private ArrayList<DatagramPacket> queue;
     private ConnectionService service;
@@ -35,24 +27,14 @@ public class UDPServer extends Thread {
         byte[] lMessage = new byte[256];
 
         try {
-//            socket = new DatagramSocket(33334); TODO remove
 
             while(running){
                 if (this.queue.size() > 0) {
                     System.out.println("sending");
                     DatagramPacket packet = this.queue.get(0);
 
-//                    InetAddress address = InetAddress.getByName("192.168.178.20"); TODO remove
-
                     String message = new String(lMessage, 0, packet.getLength());
                     this.service.write(message.getBytes());
-
-//                    int port = 33334; TODO remove
-//                    packet.setAddress(address);
-//                    packet.setPort(port);
-
-//                    socket.send(packet); TODO remove
-//                    this.buf = null;
                     this.queue.remove(0);
 
                     //TODO add timer if needed
