@@ -60,11 +60,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 switch (state) {
                     case BluetoothAdapter.STATE_OFF:
                         Log.d(TAG, "onReceive: STATE OFF");
-                        connectionService.pauseSender();
                         break;
                     case BluetoothAdapter.STATE_TURNING_OFF:
                         Log.d(TAG, "onReceive: STATE TURNING OFF");
-                        connectionService.pauseSender();
                         break;
                     case BluetoothAdapter.STATE_ON:
                         Log.d(TAG, "onReceive: STATE ON");
@@ -141,6 +139,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 if (device.getBondState() == BluetoothDevice.BOND_BONDED) {
                     Log.d(TAG, "onReceiveFour: Bonded.");
                     mainDevice = device;
+                    connectionService.resumeSender();
                 }
 
                 if (device.getBondState() == BluetoothDevice.BOND_BONDING) {

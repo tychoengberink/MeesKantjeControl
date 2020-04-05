@@ -26,7 +26,6 @@ public class UDPClient extends Thread {
 
             while(bKeepRunning) {
                 socket.receive(packet);
-//                this.server.addQueue(packet);
                 this.service.addQueue(packet);
 
                 message = new String(lMessage, 0, packet.getLength());

@@ -205,16 +205,16 @@ public class ConnectionService {
             paused = false;
 
             while (true) {
-                System.out.println("RUNNING");
-                try {
-                    bytes = mmInStream.read(buffer);
-                    String incoming = new String(buffer, 0, bytes);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    break;
-                }
+//                try {
+//                    bytes = mmInStream.read(buffer);
+//                    String incoming = new String(buffer, 0, bytes);
+//                } catch (IOException e) {
+//                    e.printStackTrace();
+//                    break;
+//                }
 
                 if (queue.size() > 0 && !paused) {
+                    System.out.println("Sending");
                     DatagramPacket packet = queue.get(0);
                     write(new String(lMessage, 0, packet.getLength()).getBytes());
                 }
@@ -248,10 +248,12 @@ public class ConnectionService {
     }
 
     public void pauseSender() {
+        System.out.println("pausing sender");
         this.paused = true;
     }
 
     public void resumeSender() {
+        System.out.println("resuming sender");
         this.paused = false;
     }
 }
