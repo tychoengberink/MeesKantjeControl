@@ -175,6 +175,7 @@ public class ConnectionService {
         private final BluetoothSocket mmSocket;
         private final InputStream mmInStream;
         private final OutputStream mmOutStream;
+        boolean bKeepRunning = true;
 
         public ConnectedThread(BluetoothSocket socket) {
             this.mmSocket = socket;
@@ -214,7 +215,7 @@ public class ConnectionService {
 
             paused = false;
 
-            while (true) {
+            while (this.bKeepRunning) {
                 System.out.println(queue.getQueueLength());
                 System.out.println(paused);
 //                try {
@@ -240,6 +241,10 @@ public class ConnectionService {
                 }
 
             }
+        }
+
+        public void kill() {
+            this.bKeepRunning = false;
         }
 
         public void write(byte[] bytes) {
@@ -272,5 +277,9 @@ public class ConnectionService {
     public void resumeSender() {
         System.out.println("resuming sender");
         this.paused = false;
+    }
+
+    public void killSender() {
+        manageMyConnectedSocket.kill();
     }
 }

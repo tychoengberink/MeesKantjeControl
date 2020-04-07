@@ -291,6 +291,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     protected void onStop() {
 //        dataSender.kill();
         dataProvider.kill();
+        connectionService.killSender();
 
         super.onStop();
     }
