@@ -157,6 +157,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     @Override
     protected void onDestroy() {
         super.onDestroy();
+        finish();
         unregisterReceiver(broadcastReceiver);
         unregisterReceiver(broadcastReceiverSec);
         unregisterReceiver(broadcastReceiverThird);
@@ -292,7 +293,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 //        dataSender.kill();
         dataProvider.kill();
 //        connectionService.kill();
-
         super.onStop();
     }
 }

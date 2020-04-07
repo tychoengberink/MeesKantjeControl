@@ -195,6 +195,7 @@ public class ConnectionService {
 
         public void write(byte[] bytes) {
             try {
+                System.out.println(mmOutStream);
                 mmOutStream.write(bytes);
             } catch (IOException e) {
                 e.printStackTrace();
@@ -221,4 +222,8 @@ public class ConnectionService {
                 System.out.println("resuming sender");
                 this.paused = false;
             }
+
+//            public void kill(){
+//
+//            }
         }
