@@ -24,8 +24,8 @@ public class BluetoothConnector {
     /**
      * @param device the device
      * @param secure if connection should be done via a secure socket
-     * @param adapter the Android BT adapter
-     * @param uuidCandidates a list of UUIDs. if null or empty, the Serial PP id is used
+     * @param adapter the Android bluetooth adapter
+     * @param uuidCandidates a list of UUIDs. The Serial PP id is used when the list is empty.
      */
     public BluetoothConnector(BluetoothDevice device, boolean secure, BluetoothAdapter adapter,
                               List<UUID> uuidCandidates) {
@@ -40,6 +40,11 @@ public class BluetoothConnector {
         }
     }
 
+    /**
+     * Connects to the bluetooth device.
+     * @return The bluetooth socket.
+     * @throws IOException
+     */
     public BluetoothSocketWrapper connect() throws IOException {
         boolean success = false;
         while (selectSocket()) {
@@ -74,6 +79,11 @@ public class BluetoothConnector {
         return bluetoothSocket;
     }
 
+    /**
+     * Selects a socket.
+     * @return {boolean} if socket connects to a different uuid.
+     * @throws IOException
+     */
     private boolean selectSocket() throws IOException {
         if (candidate >= uuidCandidates.size()) {
             return false;
@@ -161,6 +171,11 @@ public class BluetoothConnector {
 
         private BluetoothSocket fallbackSocket;
 
+        /**
+         * Creates a fallback socket.
+         * @param tmp Temporary BluetoothSocket.
+         * @throws FallbackException
+         */
         public FallbackBluetoothSocket(BluetoothSocket tmp) throws FallbackException {
             super(tmp);
             try

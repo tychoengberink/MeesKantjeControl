@@ -224,7 +224,7 @@ public class ConnectionService {
                     System.out.println("Sending");
                     DatagramPacket packet = queue.getNextPacket();
                     if (packet != null) {
-                        write(new String(lMessage, 0, packet.getLength()).getBytes());
+                        write(packet.getData());
                     }
                 }
             }
