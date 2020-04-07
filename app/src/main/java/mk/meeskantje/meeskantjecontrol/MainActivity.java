@@ -37,6 +37,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     private UDPClient dataProvider;
     private UDPServer dataSender;
     private PacketQueue queue;
+    private boolean selected;
 
     private static final String TAG = "MainActivity";
     public ArrayList<BluetoothDevice> devices;
@@ -168,6 +169,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        this.selected = false;
+
         queue = new PacketQueue();
 
         onOffButton = findViewById(R.id.onOffButton);
@@ -253,6 +256,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     @Override
     public void onItemClick(AdapterView<?> adapterView, View view, int i, long l) {
         bluetoothAdapter.cancelDiscovery();
+        this.selected = true;
 
         if (Build.VERSION.SDK_INT > Build.VERSION_CODES.JELLY_BEAN_MR2) {
             Log.d(TAG, "Trying to pair with " + devices.get(i).getName());
@@ -263,8 +267,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     public void startBluetoothConnection(View view) {
-        System.out.println("starting Client");
-        connectionService.startClient(mainDevice);
+        if (this.selected) {
+            System.out.println("starting Client");
+            connectionService.startClient(mainDevice);
+        }
     }
 
     protected void onResume() {

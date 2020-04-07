@@ -235,6 +235,7 @@ public class ConnectionService {
                     if (packet != null) {
                         System.out.println(Arrays.toString(packet.getData()));
                         this.write(packet.getData());
+                        queue.removeNextPacket();
                     }
                 }
 

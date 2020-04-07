@@ -18,14 +18,20 @@ public class PacketQueue {
     public DatagramPacket getNextPacket() {
         System.out.println("TEST");
         DatagramPacket tmp = this.packets.get(0);
-       // this.packets.remove(0);
         return tmp;
+    }
+
+    public void removeNextPacket() {
+         this.packets.remove(0);
     }
 
     public DatagramPacket getNextDownPacket() {
         DatagramPacket tmp = this.downPackets.get(0);
-        this.downPackets.remove(0);
         return tmp;
+    }
+
+    public void removeNextDownPacket() {
+        this.downPackets.remove(0);
     }
 
     public int getQueueLength() {

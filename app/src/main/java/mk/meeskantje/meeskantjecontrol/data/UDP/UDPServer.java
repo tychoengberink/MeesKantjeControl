@@ -43,6 +43,7 @@ public class UDPServer extends Thread {
                     packet.setAddress(address);
                     packet.setPort(port);
                     socket.send(packet);
+                    this.queue.removeNextDownPacket();
                 }
                 continue;
 
