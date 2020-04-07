@@ -189,10 +189,11 @@ public class ConnectionService {
             try {
                 System.out.println("SOCKET: " + mmSocket.toString());
                 System.out.println("QUEUE: " + queue.getPackets().size());
-                tmpIn = mmSocket.getInputStream();
+//                tmpIn = mmSocket.getInputStream();
 //                tmpOut = mmSocket.getOutputStream();
 
                 //TODO
+                tmpIn = connector.getBluetoothSocket().getInputStream();
                 tmpOut = connector.getBluetoothSocket().getOutputStream();
             } catch (IOException e) {
                 e.printStackTrace();

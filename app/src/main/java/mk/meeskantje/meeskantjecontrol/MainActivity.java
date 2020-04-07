@@ -23,6 +23,7 @@ import android.widget.ListView;
 import java.util.UUID;
 
 import mk.meeskantje.meeskantjecontrol.data.UDP.UDPClient;
+import mk.meeskantje.meeskantjecontrol.data.UDP.UDPServer;
 import mk.meeskantje.meeskantjecontrol.data.bluetooth.ConnectionService;
 import mk.meeskantje.meeskantjecontrol.data.bluetooth.DeviceListAdapter;
 import mk.meeskantje.meeskantjecontrol.data.bluetooth.PacketQueue;
@@ -35,6 +36,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     Button startButton;
 
     private UDPClient dataProvider;
+    private UDPServer dataSender;
     private PacketQueue queue;
 
     private static final String TAG = "MainActivity";
@@ -279,12 +281,15 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     protected void onResume() {
+        dataSender = new UDPServer();
+        dataSender.start();
         dataProvider = new UDPClient(queue);
         dataProvider.start();
         super.onResume();
     }
 
     protected void onPause() {
+        dataSender.kill();
         dataProvider.kill();
         super.onPause();
     }
@@ -293,6 +298,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     @Override
     protected void onStop() {
+        dataSender.kill();
         dataProvider.kill();
 
         super.onStop();
