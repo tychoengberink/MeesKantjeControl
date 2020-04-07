@@ -213,13 +213,15 @@ public class ConnectionService {
             paused = false;
 
             while (true) {
-//                try {
-//                    bytes = mmInStream.read(buffer);
-//                    String incoming = new String(buffer, 0, bytes);
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                    break;
-//                }
+                try {
+                    bytes = mmInStream.read(buffer);
+                    String incoming = new String(buffer, 0, bytes);
+                    DatagramPacket newPacket = new DatagramPacket(lMessage, lMessage.length);
+                    newPacket.setData(incoming.getBytes(), 0, incoming.getBytes().length);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    break;
+                }
 
                 if (queue.getQueueLength() > 0 && !paused && mmOutStream != null) {
                     System.out.println("Sending");

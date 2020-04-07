@@ -5,6 +5,7 @@ import java.util.ArrayList;
 
 public class PacketQueue {
     private ArrayList<DatagramPacket> packets;
+    private ArrayList<DatagramPacket> downPackets;
 
     public PacketQueue () {
         this.packets = new ArrayList<>();
@@ -20,11 +21,25 @@ public class PacketQueue {
         return tmp;
     }
 
+    public DatagramPacket getNextDownPacket() {
+        DatagramPacket tmp = this.downPackets.get(0);
+        this.downPackets.remove(0);
+        return tmp;
+    }
+
     public int getQueueLength() {
         return this.packets.size();
     }
 
     public ArrayList<DatagramPacket> getPackets() {
         return this.packets;
+    }
+
+    public int getQueueDownLength() {
+        return this.downPackets.size();
+    }
+
+    public ArrayList<DatagramPacket> getDownPackets() {
+        return this.downPackets;
     }
 }

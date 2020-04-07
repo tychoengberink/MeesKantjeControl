@@ -5,10 +5,17 @@ import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.SocketException;
 
+import mk.meeskantje.meeskantjecontrol.data.bluetooth.PacketQueue;
+
 public class UDPServer extends Thread {
     DatagramSocket socket;
     boolean running;
 
+    private PacketQueue queue;
+
+    public UDPServer(PacketQueue queue) {
+        this.queue = queue;
+    }
 
     public void setRunning(boolean running){
         this.running = running;
@@ -24,14 +31,19 @@ public class UDPServer extends Thread {
 
 
             while(running){
-                byte[] buf ="Hello World!".getBytes();
-                DatagramPacket packet = null;
+//                byte[] buf ="Hello World!".getBytes();
+//                DatagramPacket packet = null;
 
-                InetAddress addres = InetAddress.getByName("192.168.1.79");
+                InetAddress address = InetAddress.getByName("192.168.1.79");
                 int port = 33333;
-                packet = new DatagramPacket(buf, buf.length, addres, port);
+//                packet = new DatagramPacket(buf, buf.length, addres, port);
 
-                socket.send(packet);
+                if (this.queue.getQueueDownLength() > 0) {
+                    DatagramPacket packet = this.queue.getNextDownPacket();
+                    packet.setAddress(address);
+                    packet.setPort(port);
+                    socket.send(packet);
+                }
                 continue;
 
             }

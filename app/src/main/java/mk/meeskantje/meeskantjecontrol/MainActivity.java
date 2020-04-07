@@ -32,7 +32,6 @@ import mk.meeskantje.meeskantjecontrol.data.bluetooth.PacketQueue;
 public class MainActivity extends AppCompatActivity implements AdapterView.OnItemClickListener {
     ListView deviceList;
     Button onOffButton;
-    Button discoverable;
     Button startButton;
 
     private UDPClient dataProvider;
@@ -172,7 +171,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         queue = new PacketQueue();
 
         onOffButton = findViewById(R.id.onOffButton);
-        discoverable = findViewById(R.id.discover);
         startButton = findViewById(R.id.start_connection);
 
         devices = new ArrayList<>();
@@ -211,17 +209,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         } else {
             Log.d(TAG, "NO BLUETOOTH AVAILABLE");
         }
-    }
-
-    public void btnEnableDisable_Discoverable(View view) {
-        Log.d(TAG, "Device discoverable for 300 seconds.");
-
-        Intent discoverIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_DISCOVERABLE);
-        discoverIntent.putExtra(BluetoothAdapter.EXTRA_DISCOVERABLE_DURATION, 300);
-        startActivity(discoverIntent);
-
-        IntentFilter intentFilter = new IntentFilter(bluetoothAdapter.ACTION_SCAN_MODE_CHANGED);
-        registerReceiver(broadcastReceiverSec, intentFilter);
     }
 
     public void btnDiscover(View view) {
@@ -281,7 +268,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     protected void onResume() {
-        dataSender = new UDPServer();
+        dataSender = new UDPServer(queue);
         dataSender.start();
         dataProvider = new UDPClient(queue);
         dataProvider.start();
