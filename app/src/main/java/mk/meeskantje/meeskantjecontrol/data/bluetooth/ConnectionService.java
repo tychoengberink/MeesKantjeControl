@@ -6,6 +6,8 @@ import android.bluetooth.BluetoothDevice;
 import android.bluetooth.BluetoothServerSocket;
 import android.bluetooth.BluetoothSocket;
 import android.content.Context;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
 
 import java.io.IOException;
@@ -13,9 +15,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.DatagramPacket;
 import java.nio.charset.Charset;
-import java.sql.SQLOutput;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -23,9 +23,7 @@ import static android.provider.Settings.NameValueTable.NAME;
 
 public class ConnectionService {
     private static final String TAG = "BluetoothService";
-    private static final UUID MY_UUID = UUID.fromString("8ce255c0-200a-11e0-ac64-08002000c9a66");
-    private static final UUID DEFAULT_SPP_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
-    private static final String test = "test";
+    private static final UUID DEFAULT_SPP_UUID = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb");
 
     private PacketQueue queue;
     private boolean paused;
@@ -35,7 +33,6 @@ public class ConnectionService {
     private ConnectThread mConnectThread;
     private AcceptThread mAcceptThread;
     private ConnectedThread manageMyConnectedSocket;
-    private BluetoothConnector connector;
     ProgressDialog dialog;
     Context context;
 
@@ -54,7 +51,7 @@ public class ConnectionService {
             BluetoothServerSocket tmp = null;
             try {
                 // MY_UUID is the app's UUID string, also used by the client code.
-                tmp = mBlueToothAd.listenUsingRfcommWithServiceRecord(NAME, MY_UUID);
+                tmp = mBlueToothAd.listenUsingRfcommWithServiceRecord(NAME, DEFAULT_SPP_UUID);
 
             } catch (IOException e) {
                 Log.e(TAG, "Socket's listen() method failed", e);
@@ -100,11 +97,10 @@ public class ConnectionService {
 
         public ConnectThread(BluetoothDevice cDevice) {
             device = cDevice;
-            System.out.println(device);
             BluetoothSocket tmp = null;
 
             try {
-                tmp = device.createInsecureRfcommSocketToServiceRecord(DEFAULT_SPP_UUID);
+                tmp = device.createRfcommSocketToServiceRecord(DEFAULT_SPP_UUID);
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -115,14 +111,9 @@ public class ConnectionService {
         public void run() {
             mBlueToothAd.cancelDiscovery();
 
-            List<UUID> tmp = new ArrayList<>();
-            tmp.add(DEFAULT_SPP_UUID);
-            connector = new BluetoothConnector(device, true, mBlueToothAd, tmp);
-
             try {
                 System.out.println("connecting");
-//                connectSocket.connect();
-                connector.connect();
+                connectSocket.connect();
             } catch (IOException e) {
                 System.out.println("error");
                 e.printStackTrace();
@@ -175,111 +166,59 @@ public class ConnectionService {
         private final BluetoothSocket mmSocket;
         private final InputStream mmInStream;
         private final OutputStream mmOutStream;
-        boolean bKeepRunning = true;
 
         public ConnectedThread(BluetoothSocket socket) {
-            this.mmSocket = socket;
-
+            mmSocket = socket;
             InputStream tmpIn = null;
             OutputStream tmpOut = null;
-
             try {
-                dialog.dismiss();
-            } catch (NullPointerException e) {
-                e.printStackTrace();
-            }
-
-            try {
-                System.out.println("SOCKET: " + mmSocket.toString());
-                System.out.println("QUEUE: " + queue.getPackets().size());
-//                tmpIn = mmSocket.getInputStream();
-//                tmpOut = mmSocket.getOutputStream();
-
-                //TODO
-                tmpIn = connector.getBluetoothSocket().getInputStream();
-                tmpOut = connector.getBluetoothSocket().getOutputStream();
+                tmpIn = socket.getInputStream();
+                tmpOut = socket.getOutputStream();
             } catch (IOException e) {
-                e.printStackTrace();
             }
-
             mmInStream = tmpIn;
             mmOutStream = tmpOut;
+            dialog.cancel();
         }
 
         public void run() {
-            System.out.println("starting sender");
-            byte[] buffer = new byte[1024];
-            byte[] lMessage = new byte[256];
-
-            int bytes;
-
-            paused = false;
-
-            while (this.bKeepRunning) {
-                System.out.println(queue.getQueueLength());
-                System.out.println(paused);
-//                try {
-//                    bytes = mmInStream.read(buffer);
-//                    String incoming = new String(buffer, 0, bytes);
-//                    DatagramPacket newPacket = new DatagramPacket(lMessage, lMessage.length);
-//
-//                    newPacket.setData(incoming.getBytes(), 0, incoming.getBytes().length);
-//                } catch (Exception e) {
-//                    e.printStackTrace();
-//                    stop = true;
-//                }
-                System.out.println("CAN I HIT THIS?");
+            while (true) {
                 if (queue.getQueueLength() > 0 && !paused) {
                     System.out.println("Sending");
                     DatagramPacket packet = queue.getNextPacket();
-
                     if (packet != null) {
-                        System.out.println(Arrays.toString(packet.getData()));
-                        this.write(packet.getData());
-                        queue.removeNextPacket();
+                        write(packet.getData());
                     }
                 }
-
             }
-        }
-
-        public void kill() {
-            this.bKeepRunning = false;
         }
 
         public void write(byte[] bytes) {
             try {
-
                 mmOutStream.write(bytes);
             } catch (IOException e) {
                 e.printStackTrace();
             }
         }
 
+
         public void cancel() {
             try {
                 mmSocket.close();
             } catch (IOException e) {
-                e.printStackTrace();
+               e.printStackTrace();
             }
         }
     }
 
-    public void write(byte[] out) {
-        manageMyConnectedSocket.write(out);
-    }
 
-    public void pauseSender() {
-        System.out.println("pausing sender");
-        this.paused = true;
-    }
+    public void pauseSender () {
+                System.out.println("pausing sender");
+                this.paused = true;
+            }
 
-    public void resumeSender() {
-        System.out.println("resuming sender");
-        this.paused = false;
-    }
-
-    public void killSender() {
-        manageMyConnectedSocket.kill();
-    }
-}
+            public void resumeSender () {
+                System.out.println("resuming sender");
+                this.paused = false;
+            }
+        }

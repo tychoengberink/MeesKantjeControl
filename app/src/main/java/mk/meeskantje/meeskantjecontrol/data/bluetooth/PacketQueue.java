@@ -16,8 +16,8 @@ public class PacketQueue {
     }
 
     public DatagramPacket getNextPacket() {
-        System.out.println("TEST");
         DatagramPacket tmp = this.packets.get(0);
+        System.out.println("getNEXTPACKET");
         return tmp;
     }
 
