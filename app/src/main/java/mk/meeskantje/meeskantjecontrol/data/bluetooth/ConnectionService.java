@@ -190,7 +190,10 @@ public class ConnectionService {
                 System.out.println("SOCKET: " + mmSocket.toString());
                 System.out.println("QUEUE: " + queue.getPackets().size());
                 tmpIn = mmSocket.getInputStream();
-                tmpOut = mmSocket.getOutputStream();
+//                tmpOut = mmSocket.getOutputStream();
+
+                //TODO
+                tmpOut = connector.getBluetoothSocket().getOutputStream();
             } catch (IOException e) {
                 e.printStackTrace();
             }
@@ -220,15 +223,15 @@ public class ConnectionService {
                 if (queue.getQueueLength() > 0 && !paused && mmOutStream != null) {
                     System.out.println("Sending");
                     DatagramPacket packet = queue.getNextPacket();
-                    write(new String(lMessage, 0, packet.getLength()).getBytes());
+                    if (packet != null) {
+                        write(new String(lMessage, 0, packet.getLength()).getBytes());
+                    }
                 }
             }
         }
 
         public void write (byte[] bytes) {
             try {
-                System.out.println("OS: " + mmOutStream.toString());
-                System.out.println("AR: " + bytes.toString());
                 mmOutStream.write(bytes);
             } catch (IOException e) {
                 e.printStackTrace();

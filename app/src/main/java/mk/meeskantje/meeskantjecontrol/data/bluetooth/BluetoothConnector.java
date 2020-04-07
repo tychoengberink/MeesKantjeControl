@@ -210,4 +210,8 @@ public class BluetoothConnector {
         }
 
     }
+
+    public BluetoothSocketWrapper getBluetoothSocket() {
+        return bluetoothSocket;
+    }
 }
