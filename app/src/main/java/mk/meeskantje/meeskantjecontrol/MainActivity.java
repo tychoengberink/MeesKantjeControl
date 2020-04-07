@@ -268,24 +268,22 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     protected void onResume() {
-        dataSender = new UDPServer(queue);
-        dataSender.start();
+//        dataSender = new UDPServer(queue);
+//        dataSender.start();
         dataProvider = new UDPClient(queue);
         dataProvider.start();
         super.onResume();
     }
 
     protected void onPause() {
-        dataSender.kill();
+//        dataSender.kill();
         dataProvider.kill();
         super.onPause();
     }
 
-
-
     @Override
     protected void onStop() {
-        dataSender.kill();
+//        dataSender.kill();
         dataProvider.kill();
 
         super.onStop();

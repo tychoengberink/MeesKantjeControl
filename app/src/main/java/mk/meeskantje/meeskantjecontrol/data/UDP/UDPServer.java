@@ -35,7 +35,7 @@ public class UDPServer extends Thread {
 //                DatagramPacket packet = null;
 
                 InetAddress address = InetAddress.getByName("192.168.1.79");
-                int port = 33333;
+                int port = 33334;
 //                packet = new DatagramPacket(buf, buf.length, addres, port);
 
                 if (this.queue.getQueueDownLength() > 0) {

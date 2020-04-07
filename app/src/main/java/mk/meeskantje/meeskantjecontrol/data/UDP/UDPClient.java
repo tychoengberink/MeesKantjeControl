@@ -38,7 +38,7 @@ public class UDPClient extends Thread {
 
                 message = new String(lMessage, 0, packet.getLength());
                 lastMessage = message;
-                System.out.println(message);
+//                System.out.println(message);
             }
         } catch (Throwable e) {
             e.printStackTrace();

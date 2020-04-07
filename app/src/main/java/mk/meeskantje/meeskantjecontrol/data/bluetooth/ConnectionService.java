@@ -13,7 +13,9 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.DatagramPacket;
 import java.nio.charset.Charset;
+import java.sql.SQLOutput;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -21,7 +23,7 @@ import static android.provider.Settings.NameValueTable.NAME;
 
 public class ConnectionService {
     private static final String TAG = "BluetoothService";
-    private static final UUID MY_UUID =  UUID.fromString("8ce255c0-200a-11e0-ac64-08002000c9a66");
+    private static final UUID MY_UUID = UUID.fromString("8ce255c0-200a-11e0-ac64-08002000c9a66");
     private static final UUID DEFAULT_SPP_UUID = UUID.fromString("00001101-0000-1000-8000-00805F9B34FB");
     private static final String test = "test";
 
@@ -77,14 +79,14 @@ public class ConnectionService {
                     // the connection in a separate thread.
 
                     if (manageMyConnectedSocket == null) {
-                            manageMyConnectedSocket = new ConnectedThread(socket);
+                        manageMyConnectedSocket = new ConnectedThread(socket);
                         manageMyConnectedSocket.start();
                     }
-                try {
-                    mmServerSocket.close();
-                } catch ( IOException e) {
-                    e.printStackTrace();
-                }
+                    try {
+                        mmServerSocket.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
                     break;
                 }
             }
@@ -96,7 +98,7 @@ public class ConnectionService {
         private BluetoothDevice device;
 
 
-        public ConnectThread (BluetoothDevice cDevice) {
+        public ConnectThread(BluetoothDevice cDevice) {
             device = cDevice;
             System.out.println(device);
             BluetoothSocket tmp = null;
@@ -174,7 +176,7 @@ public class ConnectionService {
         private final InputStream mmInStream;
         private final OutputStream mmOutStream;
 
-        public ConnectedThread (BluetoothSocket socket) {
+        public ConnectedThread(BluetoothSocket socket) {
             this.mmSocket = socket;
 
             InputStream tmpIn = null;
@@ -213,28 +215,35 @@ public class ConnectionService {
             paused = false;
 
             while (true) {
-                try {
-                    bytes = mmInStream.read(buffer);
-                    String incoming = new String(buffer, 0, bytes);
-                    DatagramPacket newPacket = new DatagramPacket(lMessage, lMessage.length);
-                    newPacket.setData(incoming.getBytes(), 0, incoming.getBytes().length);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    break;
-                }
-
-                if (queue.getQueueLength() > 0 && !paused && mmOutStream != null) {
+                System.out.println(queue.getQueueLength());
+                System.out.println(paused);
+//                try {
+//                    bytes = mmInStream.read(buffer);
+//                    String incoming = new String(buffer, 0, bytes);
+//                    DatagramPacket newPacket = new DatagramPacket(lMessage, lMessage.length);
+//
+//                    newPacket.setData(incoming.getBytes(), 0, incoming.getBytes().length);
+//                } catch (Exception e) {
+//                    e.printStackTrace();
+//                    stop = true;
+//                }
+                System.out.println("CAN I HIT THIS?");
+                if (queue.getQueueLength() > 0 && !paused) {
                     System.out.println("Sending");
                     DatagramPacket packet = queue.getNextPacket();
+
                     if (packet != null) {
-                        write(packet.getData());
+                        System.out.println(Arrays.toString(packet.getData()));
+                        this.write(packet.getData());
                     }
                 }
+
             }
         }
 
-        public void write (byte[] bytes) {
+        public void write(byte[] bytes) {
             try {
+
                 mmOutStream.write(bytes);
             } catch (IOException e) {
                 e.printStackTrace();
@@ -250,7 +259,7 @@ public class ConnectionService {
         }
     }
 
-    public void write (byte[] out) {
+    public void write(byte[] out) {
         manageMyConnectedSocket.write(out);
     }
 
