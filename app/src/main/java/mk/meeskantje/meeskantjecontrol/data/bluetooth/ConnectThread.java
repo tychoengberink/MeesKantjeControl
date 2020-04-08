@@ -8,7 +8,7 @@ import android.bluetooth.BluetoothSocket;
 import java.io.IOException;
 import java.util.UUID;
 
-import mk.meeskantje.meeskantjecontrol.data.UDP.UDPClient;
+import mk.meeskantje.meeskantjecontrol.data.UDP.UDPSocket;
 
 public class ConnectThread extends Thread {
     private static final String TAG = "BluetoothService";
@@ -18,9 +18,10 @@ public class ConnectThread extends Thread {
     private BluetoothAdapter mBlueToothAd;
     private PacketQueue queue;
     private Dialog dialog;
-    private UDPClient dataprovider;
+    private UDPSocket dataHandler;
 
-    public ConnectThread(BluetoothDevice cDevice, BluetoothAdapter mBlueToothAd, UUID default_ssp, PacketQueue queue, Dialog dialog, UDPClient dataprovider) {
+
+    public ConnectThread(BluetoothDevice cDevice, BluetoothAdapter mBlueToothAd, UUID default_ssp, PacketQueue queue, Dialog dialog, UDPSocket dataHandler) {
         device = cDevice;
         BluetoothSocket tmp = null;
 
@@ -33,7 +34,7 @@ public class ConnectThread extends Thread {
         connectSocket = tmp;
         this.queue = queue;
         this.dialog = dialog;
-        this.dataprovider = dataprovider;
+        this.dataHandler = dataHandler;
     }
 
     public void run() {
@@ -50,7 +51,7 @@ public class ConnectThread extends Thread {
             }
         }
 
-        manageMyConnectedSocket = new ConnectedThread(connectSocket, queue, dialog, dataprovider);
+        manageMyConnectedSocket = new ConnectedThread(connectSocket, queue, dialog, dataHandler);
         manageMyConnectedSocket.start();
 
     }

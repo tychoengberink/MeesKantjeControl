@@ -9,7 +9,7 @@ import android.util.Log;
 import java.io.IOException;
 import java.util.UUID;
 
-import mk.meeskantje.meeskantjecontrol.data.UDP.UDPClient;
+import mk.meeskantje.meeskantjecontrol.data.UDP.UDPSocket;
 
 import static android.provider.Settings.NameValueTable.NAME;
 
@@ -19,9 +19,9 @@ public class AcceptThread extends Thread {
     private ConnectedThread manageMyConnectedSocket;
     private PacketQueue queue;
     private Dialog dialog;
-    private UDPClient dataprovider;
+    private UDPSocket dataHandler;
 
-    public AcceptThread(BluetoothAdapter mBlueToothAd, UUID default_ssp, PacketQueue queue, Dialog dialog, UDPClient dataprovider) {
+    public AcceptThread(BluetoothAdapter mBlueToothAd, UUID default_ssp, PacketQueue queue, Dialog dialog, UDPSocket dataHandler) {
         BluetoothServerSocket tmp = null;
         try {
             // MY_UUID is the app's UUID string, also used by the client code.
@@ -33,7 +33,7 @@ public class AcceptThread extends Thread {
         mmServerSocket = tmp;
         this.queue = queue;
         this.dialog = dialog;
-        this.dataprovider = dataprovider;
+        this.dataHandler = dataHandler;
     }
 
     public void run() {
@@ -52,7 +52,7 @@ public class AcceptThread extends Thread {
                 // the connection in a separate thread.
 
                 if (manageMyConnectedSocket == null) {
-                    manageMyConnectedSocket = new ConnectedThread(socket, queue, dialog, dataprovider);
+                    manageMyConnectedSocket = new ConnectedThread(socket, queue, dialog, dataHandler);
                     manageMyConnectedSocket.start();
                 }
                 try {

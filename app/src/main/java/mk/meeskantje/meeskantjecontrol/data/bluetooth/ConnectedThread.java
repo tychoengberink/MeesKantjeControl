@@ -6,8 +6,10 @@ import android.bluetooth.BluetoothSocket;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.DatagramPacket;
+import java.net.InetAddress;
 
-import mk.meeskantje.meeskantjecontrol.data.UDP.UDPClient;
+import mk.meeskantje.meeskantjecontrol.data.UDP.UDPSocket;
 
 public class ConnectedThread extends Thread {
     private final BluetoothSocket mmSocket;
@@ -15,9 +17,9 @@ public class ConnectedThread extends Thread {
     private final OutputStream mmOutStream;
     private PacketQueue queue;
     private Dialog dialog;
-    private UDPClient dataprovider;
+    private UDPSocket dataHandler;
 
-    public ConnectedThread(BluetoothSocket socket, PacketQueue queue, Dialog dialog, UDPClient dataprovider) {
+    public ConnectedThread(BluetoothSocket socket, PacketQueue queue, Dialog dialog, UDPSocket dataHandler) {
         mmSocket = socket;
         InputStream tmpIn = null;
         OutputStream tmpOut = null;
@@ -30,7 +32,7 @@ public class ConnectedThread extends Thread {
         mmOutStream = tmpOut;
         this.queue = queue;
         this.dialog = dialog;
-        this.dataprovider = dataprovider;
+        this.dataHandler = dataHandler;
     }
 
     public void run() {
@@ -40,16 +42,25 @@ public class ConnectedThread extends Thread {
             dialog.cancel();
         }
 
-        dataprovider.setConnectedThread(this);
-//        while (true) {
-//            System.out.println("SENDING");
-//            if (queue.getQueueLength() > 0) {
-//                DatagramPacket packet = queue.getNextPacket();
-//                if (packet != null) {
-//                    write(packet.getData());
-//                }
-//            }
-//        }
+        dataHandler.getReciever().setConnectedThread(this);
+        byte[] buffer = new byte[256];
+        int bytes;
+
+        // Keep looping to listen for received messages
+        while (true) {
+            try {
+                bytes = mmInStream.read(buffer);            //read bytes from input buffer
+                String readMessage = new String(buffer, 0, bytes);
+                InetAddress addres = InetAddress.getByName("192.168.1.79");
+                int port = 33333;
+                DatagramPacket packet = null;
+                byte[] buf = readMessage.getBytes();
+                packet = new DatagramPacket(buf, buf.length, addres, port);
+                dataHandler.send(packet);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public void write(byte[] bytes) {
@@ -68,5 +79,9 @@ public class ConnectedThread extends Thread {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public InputStream getMmInStream() {
+        return mmInStream;
     }
 }

@@ -7,7 +7,7 @@ import android.content.Context;
 
 import java.util.UUID;
 
-import mk.meeskantje.meeskantjecontrol.data.UDP.UDPClient;
+import mk.meeskantje.meeskantjecontrol.data.UDP.UDPSocket;
 
 public class ConnectionService {
     private PacketQueue queue;
@@ -16,17 +16,17 @@ public class ConnectionService {
     private final BluetoothAdapter mBlueToothAd;
     private ConnectThread mConnectThread;
     private AcceptThread mAcceptThread;
-    private UDPClient dataprovider;
+    private UDPSocket dataHandler;
 
     ProgressDialog dialog;
     Context context;
 
 
-    public ConnectionService(PacketQueue queue, Context context, UDPClient dataprovider) {
+    public ConnectionService(PacketQueue queue, Context context, UDPSocket dataHandler) {
         this.context = context;
         this.mBlueToothAd = BluetoothAdapter.getDefaultAdapter();
         this.queue = queue;
-        this.dataprovider = dataprovider;
+        this.dataHandler = dataHandler;
         start();
     }
 
@@ -38,7 +38,7 @@ public class ConnectionService {
         }
 
         if (mAcceptThread == null) {
-            mAcceptThread = new AcceptThread(mBlueToothAd, DEFAULT_SPP_UUID, queue, dialog, dataprovider);
+            mAcceptThread = new AcceptThread(mBlueToothAd, DEFAULT_SPP_UUID, queue, dialog, dataHandler);
             mAcceptThread.start();
         }
     }
@@ -46,7 +46,7 @@ public class ConnectionService {
     public void startClient(BluetoothDevice device) {
         dialog = ProgressDialog.show(context, "Connecting bluetooth", "Loading...", true);
 
-        mConnectThread = new ConnectThread(device, mBlueToothAd, DEFAULT_SPP_UUID, queue, dialog, dataprovider);
+        mConnectThread = new ConnectThread(device, mBlueToothAd, DEFAULT_SPP_UUID, queue, dialog, dataHandler);
         mConnectThread.start();
     }
 

@@ -18,10 +18,8 @@ import android.widget.ListView;
 import androidx.appcompat.app.AppCompatActivity;
 
 import java.util.ArrayList;
-import java.util.UUID;
 
-import mk.meeskantje.meeskantjecontrol.data.UDP.UDPClient;
-import mk.meeskantje.meeskantjecontrol.data.UDP.UDPServer;
+import mk.meeskantje.meeskantjecontrol.data.UDP.UDPSocket;
 import mk.meeskantje.meeskantjecontrol.data.bluetooth.ConnectionService;
 import mk.meeskantje.meeskantjecontrol.data.bluetooth.DeviceListAdapter;
 import mk.meeskantje.meeskantjecontrol.data.bluetooth.PacketQueue;
@@ -32,22 +30,16 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     Button onOffButton;
     Button startButton;
 
-    private UDPClient dataProvider;
-    private UDPServer dataSender;
+    private UDPSocket dataHandler;
     private PacketQueue queue;
     private boolean selected;
 
     private static final String TAG = "MainActivity";
     public ArrayList<BluetoothDevice> devices;
     public DeviceListAdapter deviceListAdapter;
-
-    private static final UUID MY_UUID_INSECURE = UUID.fromString("8ce255c0-200a-11e0-ac64-08002000c9a66");
-
     private BluetoothAdapter bluetoothAdapter;
     private ConnectionService connectionService;
-
     private BluetoothDevice mainDevice;
-
     private final static int REQUEST_ENABLE_BT = 1;
 
     private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
@@ -66,117 +58,11 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     };
 
 
-//    private final BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
-//        @Override
-//        public void onReceive(Context context, Intent intent) {
-//            String action = intent.getAction();
-//            if (action.equals(BluetoothAdapter.ACTION_STATE_CHANGED)) {
-//                final int state = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, bluetoothAdapter.ERROR);
-//
-//                switch (state) {
-//                    case BluetoothAdapter.STATE_OFF:
-//                        Log.d(TAG, "onReceive: STATE OFF");
-//                        break;
-//                    case BluetoothAdapter.STATE_TURNING_OFF:
-//                        Log.d(TAG, "onReceive: STATE TURNING OFF");
-//                        break;
-//                    case BluetoothAdapter.STATE_ON:
-//                        Log.d(TAG, "onReceive: STATE ON");
-//                        break;
-//                    case BluetoothAdapter.STATE_TURNING_ON:
-//                        Log.d(TAG, "onReceive: STATE TURNING ON");
-//                        break;
-//                }
-//            }
-//        }
-//    };
-//
-//    private final BroadcastReceiver broadcastReceiverSec = new BroadcastReceiver() {
-//        @Override
-//        public void onReceive(Context context, Intent intent) {
-//            final String action = intent.getAction();
-//
-//            if (action.equals(BluetoothAdapter.ACTION_SCAN_MODE_CHANGED)) {
-//                int mode = intent.getIntExtra(BluetoothAdapter.EXTRA_SCAN_MODE, BluetoothAdapter.ERROR);
-//
-//                switch (mode) {
-//                    case BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE:
-//                        Log.d(TAG, "onReceiveSec: Discoverability Enabled.");
-//                        break;
-//                    case BluetoothAdapter.SCAN_MODE_CONNECTABLE:
-//                        Log.d(TAG, "onReceiveSec: Able to receive connections.");
-//                        break;
-//                    case BluetoothAdapter.STATE_CONNECTING:
-//                        Log.d(TAG, "onReceiveSec: Connecting...");
-//                        break;
-//                    case BluetoothAdapter.STATE_CONNECTED:
-//                        Log.d(TAG, "onReceiveSec: Connected.");
-//                        break;
-//                }
-//            }
-//        }
-//    };
-//
-//    private BroadcastReceiver broadcastReceiverThird = new BroadcastReceiver() {
-//        @Override
-//        public void onReceive(Context context, Intent intent) {
-//            final String action = intent.getAction();
-//
-//            if (action.equals(BluetoothDevice.ACTION_FOUND)) {
-//                BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-//                devices.add(device);
-//                Log.d(TAG, "onReceiveThird: " + device.getName() + ": " + device.getAddress());
-//                deviceListAdapter = new DeviceListAdapter(context, R.layout.device_adapter_view, devices);
-//                deviceList.setAdapter(deviceListAdapter);
-//            }
-//            else if (BluetoothDevice.ACTION_ACL_CONNECTED.equals(action)) {
-//                Log.d(TAG, "onReceiveThird: Connected.");
-//            }
-//            else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
-//                Log.d(TAG, "onReceiveThird: Discovery finished.");
-//            }
-//            else if (BluetoothDevice.ACTION_ACL_DISCONNECT_REQUESTED.equals(action)) {
-//                Log.d(TAG, "onReceiveThird: Requested disconnection.");
-//            }
-//            else if (BluetoothDevice.ACTION_ACL_DISCONNECTED.equals(action)) {
-//                Log.d(TAG, "onReceiveThird: Disconnected.");
-//            }
-//        }
-//    };
-//
-//    private BroadcastReceiver broadcastReceiverFour = new BroadcastReceiver() {
-//        @Override
-//        public void onReceive(Context context, Intent intent) {
-//            final String action = intent.getAction();
-//
-//            if (action.equals(BluetoothDevice.ACTION_BOND_STATE_CHANGED)) {
-//                BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-//
-//                if (device.getBondState() == BluetoothDevice.BOND_BONDED) {
-//                    Log.d(TAG, "onReceiveFour: Bonded.");
-//                    mainDevice = device;
-//                    connectionService.resumeSender();
-//                }
-//
-//                if (device.getBondState() == BluetoothDevice.BOND_BONDING) {
-//                    Log.d(TAG, "onReceiveFour: Bonding.");
-//                }
-//
-//                if (device.getBondState() == BluetoothDevice.BOND_NONE) {
-//                    Log.d(TAG, "onReceiveFour: No Bond.");
-//                }
-//            }
-//        }
-//    };
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
 
         unregisterReceiver(mReceiver);
-//        unregisterReceiver(broadcastReceiverSec);
-//        unregisterReceiver(broadcastReceiverThird);
-//        unregisterReceiver(broadcastReceiverFour);
     }
 
 
@@ -199,9 +85,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         deviceList.setOnItemClickListener(MainActivity.this);
 
-//        IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_BOND_STATE_CHANGED);
-//        registerReceiver(broadcastReceiverFour, filter);
-
         onOffButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -217,8 +100,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
                 startActivityForResult(enableIntent, REQUEST_ENABLE_BT);
 
-//                IntentFilter bluetoothIntent = new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED);
-//                registerReceiver(broadcastReceiver, bluetoothIntent);
             } else {
                 if (connectionService != null) {
                     if (connectionService.getmConnectThread() != null) {
@@ -229,8 +110,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                     }
                 }
                 bluetoothAdapter.disable();
-//                IntentFilter bluetoothIntent = new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED);
-//                registerReceiver(broadcastReceiver, bluetoothIntent);
             }
         } else {
             Log.d(TAG, "NO BLUETOOTH AVAILABLE");
@@ -245,13 +124,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         if (bluetoothAdapter.isDiscovering()) {
             bluetoothAdapter.cancelDiscovery();
             Log.d(TAG, "Canceling discovery");
-
-//            bluetoothAdapter.startDiscovery();
-//            IntentFilter discoverDevicesIntent = new IntentFilter(BluetoothDevice.ACTION_FOUND);
-//            discoverDevicesIntent.addAction(BluetoothDevice.ACTION_ACL_CONNECTED);
-//            discoverDevicesIntent.addAction(BluetoothDevice.ACTION_ACL_DISCONNECT_REQUESTED);
-//            discoverDevicesIntent.addAction(BluetoothDevice.ACTION_ACL_DISCONNECTED);
-//            registerReceiver(broadcastReceiverThird, discoverDevicesIntent);
         }
 
         if (!bluetoothAdapter.isDiscovering()) {
@@ -259,9 +131,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
             bluetoothAdapter.startDiscovery();
             IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
-            registerReceiver(mReceiver, filter); // Don't forget to unregister during onDestroy
-//            IntentFilter discoverDevicesIntent = new IntentFilter(BluetoothDevice.ACTION_FOUND);
-//            registerReceiver(broadcastReceiverThird, discoverDevicesIntent);
+            registerReceiver(mReceiver, filter);
         }
     }
 
@@ -287,7 +157,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             Log.d(TAG, "Trying to pair with " + devices.get(i).getName());
             devices.get(i).createBond();
             mainDevice = devices.get(i);
-            connectionService = new ConnectionService(queue, this, dataProvider);
+            connectionService = new ConnectionService(queue, this, dataHandler);
         }
     }
 
@@ -301,24 +171,18 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     }
 
     protected void onResume() {
-//        dataSender = new UDPServer(queue);
-//        dataSender.start();
-        dataProvider = new UDPClient(queue);
-        dataProvider.start();
+        dataHandler = new UDPSocket(33333, queue);
         super.onResume();
     }
 
     protected void onPause() {
-//        dataSender.kill();
-//        dataProvider.kill();
+        dataHandler.stop();
         super.onPause();
     }
 
     @Override
     protected void onStop() {
-//        dataSender.kill();
-        dataProvider.kill();
-//        connectionService.kill();
+        dataHandler.stop();
         super.onStop();
     }
 }
