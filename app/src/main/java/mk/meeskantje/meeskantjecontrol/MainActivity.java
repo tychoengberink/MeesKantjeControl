@@ -1,7 +1,5 @@
 package mk.meeskantje.meeskantjecontrol;
 
-import androidx.appcompat.app.AppCompatActivity;
-
 import android.Manifest;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
@@ -12,14 +10,14 @@ import android.content.IntentFilter;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
-
-import java.util.ArrayList;
-
 import android.view.View;
 import android.widget.AdapterView;
 import android.widget.Button;
 import android.widget.ListView;
 
+import androidx.appcompat.app.AppCompatActivity;
+
+import java.util.ArrayList;
 import java.util.UUID;
 
 import mk.meeskantje.meeskantjecontrol.data.UDP.UDPClient;
@@ -50,118 +48,135 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     private BluetoothDevice mainDevice;
 
+    private final static int REQUEST_ENABLE_BT = 1;
 
-    private final BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
-        @Override
+    private final BroadcastReceiver mReceiver = new BroadcastReceiver() {
         public void onReceive(Context context, Intent intent) {
             String action = intent.getAction();
-            if (action.equals(BluetoothAdapter.ACTION_STATE_CHANGED)) {
-                final int state = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, bluetoothAdapter.ERROR);
-
-                switch (state) {
-                    case BluetoothAdapter.STATE_OFF:
-                        Log.d(TAG, "onReceive: STATE OFF");
-                        break;
-                    case BluetoothAdapter.STATE_TURNING_OFF:
-                        Log.d(TAG, "onReceive: STATE TURNING OFF");
-                        break;
-                    case BluetoothAdapter.STATE_ON:
-                        Log.d(TAG, "onReceive: STATE ON");
-                        break;
-                    case BluetoothAdapter.STATE_TURNING_ON:
-                        Log.d(TAG, "onReceive: STATE TURNING ON");
-                        break;
-                }
-            }
-        }
-    };
-
-    private final BroadcastReceiver broadcastReceiverSec = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            final String action = intent.getAction();
-
-            if (action.equals(BluetoothAdapter.ACTION_SCAN_MODE_CHANGED)) {
-                int mode = intent.getIntExtra(BluetoothAdapter.EXTRA_SCAN_MODE, BluetoothAdapter.ERROR);
-
-                switch (mode) {
-                    case BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE:
-                        Log.d(TAG, "onReceiveSec: Discoverability Enabled.");
-                        break;
-                    case BluetoothAdapter.SCAN_MODE_CONNECTABLE:
-                        Log.d(TAG, "onReceiveSec: Able to receive connections.");
-                        break;
-                    case BluetoothAdapter.STATE_CONNECTING:
-                        Log.d(TAG, "onReceiveSec: Connecting...");
-                        break;
-                    case BluetoothAdapter.STATE_CONNECTED:
-                        Log.d(TAG, "onReceiveSec: Connected.");
-                        break;
-                }
-            }
-        }
-    };
-
-    private BroadcastReceiver broadcastReceiverThird = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            final String action = intent.getAction();
-
-            if (action.equals(BluetoothDevice.ACTION_FOUND)) {
+            // When discovery finds a device
+            if (BluetoothDevice.ACTION_FOUND.equals(action)) {
+                // Get the BluetoothDevice object from the Intent
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
                 devices.add(device);
                 Log.d(TAG, "onReceiveThird: " + device.getName() + ": " + device.getAddress());
                 deviceListAdapter = new DeviceListAdapter(context, R.layout.device_adapter_view, devices);
                 deviceList.setAdapter(deviceListAdapter);
             }
-            else if (BluetoothDevice.ACTION_ACL_CONNECTED.equals(action)) {
-                Log.d(TAG, "onReceiveThird: Connected.");
-            }
-            else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
-                Log.d(TAG, "onReceiveThird: Discovery finished.");
-            }
-            else if (BluetoothDevice.ACTION_ACL_DISCONNECT_REQUESTED.equals(action)) {
-                Log.d(TAG, "onReceiveThird: Requested disconnection.");
-            }
-            else if (BluetoothDevice.ACTION_ACL_DISCONNECTED.equals(action)) {
-                Log.d(TAG, "onReceiveThird: Disconnected.");
-            }
         }
     };
 
-    private BroadcastReceiver broadcastReceiverFour = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            final String action = intent.getAction();
 
-            if (action.equals(BluetoothDevice.ACTION_BOND_STATE_CHANGED)) {
-                BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-
-                if (device.getBondState() == BluetoothDevice.BOND_BONDED) {
-                    Log.d(TAG, "onReceiveFour: Bonded.");
-                    mainDevice = device;
-                    connectionService.resumeSender();
-                }
-
-                if (device.getBondState() == BluetoothDevice.BOND_BONDING) {
-                    Log.d(TAG, "onReceiveFour: Bonding.");
-                }
-
-                if (device.getBondState() == BluetoothDevice.BOND_NONE) {
-                    Log.d(TAG, "onReceiveFour: No Bond.");
-                }
-            }
-        }
-    };
+//    private final BroadcastReceiver broadcastReceiver = new BroadcastReceiver() {
+//        @Override
+//        public void onReceive(Context context, Intent intent) {
+//            String action = intent.getAction();
+//            if (action.equals(BluetoothAdapter.ACTION_STATE_CHANGED)) {
+//                final int state = intent.getIntExtra(BluetoothAdapter.EXTRA_STATE, bluetoothAdapter.ERROR);
+//
+//                switch (state) {
+//                    case BluetoothAdapter.STATE_OFF:
+//                        Log.d(TAG, "onReceive: STATE OFF");
+//                        break;
+//                    case BluetoothAdapter.STATE_TURNING_OFF:
+//                        Log.d(TAG, "onReceive: STATE TURNING OFF");
+//                        break;
+//                    case BluetoothAdapter.STATE_ON:
+//                        Log.d(TAG, "onReceive: STATE ON");
+//                        break;
+//                    case BluetoothAdapter.STATE_TURNING_ON:
+//                        Log.d(TAG, "onReceive: STATE TURNING ON");
+//                        break;
+//                }
+//            }
+//        }
+//    };
+//
+//    private final BroadcastReceiver broadcastReceiverSec = new BroadcastReceiver() {
+//        @Override
+//        public void onReceive(Context context, Intent intent) {
+//            final String action = intent.getAction();
+//
+//            if (action.equals(BluetoothAdapter.ACTION_SCAN_MODE_CHANGED)) {
+//                int mode = intent.getIntExtra(BluetoothAdapter.EXTRA_SCAN_MODE, BluetoothAdapter.ERROR);
+//
+//                switch (mode) {
+//                    case BluetoothAdapter.SCAN_MODE_CONNECTABLE_DISCOVERABLE:
+//                        Log.d(TAG, "onReceiveSec: Discoverability Enabled.");
+//                        break;
+//                    case BluetoothAdapter.SCAN_MODE_CONNECTABLE:
+//                        Log.d(TAG, "onReceiveSec: Able to receive connections.");
+//                        break;
+//                    case BluetoothAdapter.STATE_CONNECTING:
+//                        Log.d(TAG, "onReceiveSec: Connecting...");
+//                        break;
+//                    case BluetoothAdapter.STATE_CONNECTED:
+//                        Log.d(TAG, "onReceiveSec: Connected.");
+//                        break;
+//                }
+//            }
+//        }
+//    };
+//
+//    private BroadcastReceiver broadcastReceiverThird = new BroadcastReceiver() {
+//        @Override
+//        public void onReceive(Context context, Intent intent) {
+//            final String action = intent.getAction();
+//
+//            if (action.equals(BluetoothDevice.ACTION_FOUND)) {
+//                BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+//                devices.add(device);
+//                Log.d(TAG, "onReceiveThird: " + device.getName() + ": " + device.getAddress());
+//                deviceListAdapter = new DeviceListAdapter(context, R.layout.device_adapter_view, devices);
+//                deviceList.setAdapter(deviceListAdapter);
+//            }
+//            else if (BluetoothDevice.ACTION_ACL_CONNECTED.equals(action)) {
+//                Log.d(TAG, "onReceiveThird: Connected.");
+//            }
+//            else if (BluetoothAdapter.ACTION_DISCOVERY_FINISHED.equals(action)) {
+//                Log.d(TAG, "onReceiveThird: Discovery finished.");
+//            }
+//            else if (BluetoothDevice.ACTION_ACL_DISCONNECT_REQUESTED.equals(action)) {
+//                Log.d(TAG, "onReceiveThird: Requested disconnection.");
+//            }
+//            else if (BluetoothDevice.ACTION_ACL_DISCONNECTED.equals(action)) {
+//                Log.d(TAG, "onReceiveThird: Disconnected.");
+//            }
+//        }
+//    };
+//
+//    private BroadcastReceiver broadcastReceiverFour = new BroadcastReceiver() {
+//        @Override
+//        public void onReceive(Context context, Intent intent) {
+//            final String action = intent.getAction();
+//
+//            if (action.equals(BluetoothDevice.ACTION_BOND_STATE_CHANGED)) {
+//                BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
+//
+//                if (device.getBondState() == BluetoothDevice.BOND_BONDED) {
+//                    Log.d(TAG, "onReceiveFour: Bonded.");
+//                    mainDevice = device;
+//                    connectionService.resumeSender();
+//                }
+//
+//                if (device.getBondState() == BluetoothDevice.BOND_BONDING) {
+//                    Log.d(TAG, "onReceiveFour: Bonding.");
+//                }
+//
+//                if (device.getBondState() == BluetoothDevice.BOND_NONE) {
+//                    Log.d(TAG, "onReceiveFour: No Bond.");
+//                }
+//            }
+//        }
+//    };
 
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        finish();
-        unregisterReceiver(broadcastReceiver);
-        unregisterReceiver(broadcastReceiverSec);
-        unregisterReceiver(broadcastReceiverThird);
-        unregisterReceiver(broadcastReceiverFour);
+
+        unregisterReceiver(mReceiver);
+//        unregisterReceiver(broadcastReceiverSec);
+//        unregisterReceiver(broadcastReceiverThird);
+//        unregisterReceiver(broadcastReceiverFour);
     }
 
 
@@ -184,8 +199,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
         deviceList.setOnItemClickListener(MainActivity.this);
 
-        IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_BOND_STATE_CHANGED);
-        registerReceiver(broadcastReceiverFour, filter);
+//        IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_BOND_STATE_CHANGED);
+//        registerReceiver(broadcastReceiverFour, filter);
 
         onOffButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -200,15 +215,22 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         if (bluetoothAdapter != null) {
             if (!bluetoothAdapter.isEnabled()) {
                 Intent enableIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-                startActivity(enableIntent);
+                startActivityForResult(enableIntent, REQUEST_ENABLE_BT);
 
-                IntentFilter bluetoothIntent = new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED);
-                registerReceiver(broadcastReceiver, bluetoothIntent);
+//                IntentFilter bluetoothIntent = new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED);
+//                registerReceiver(broadcastReceiver, bluetoothIntent);
             } else {
+                if (connectionService != null) {
+                    if (connectionService.getmConnectThread() != null) {
+                        connectionService.getmConnectThread().cancel();
+                    }
+                    if (connectionService.getmAcceptThread() != null) {
+                        connectionService.getmAcceptThread().cancel();
+                    }
+                }
                 bluetoothAdapter.disable();
-
-                IntentFilter bluetoothIntent = new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED);
-                registerReceiver(broadcastReceiver, bluetoothIntent);
+//                IntentFilter bluetoothIntent = new IntentFilter(BluetoothAdapter.ACTION_STATE_CHANGED);
+//                registerReceiver(broadcastReceiver, bluetoothIntent);
             }
         } else {
             Log.d(TAG, "NO BLUETOOTH AVAILABLE");
@@ -224,20 +246,22 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             bluetoothAdapter.cancelDiscovery();
             Log.d(TAG, "Canceling discovery");
 
-            bluetoothAdapter.startDiscovery();
-            IntentFilter discoverDevicesIntent = new IntentFilter(BluetoothDevice.ACTION_FOUND);
-            discoverDevicesIntent.addAction(BluetoothDevice.ACTION_ACL_CONNECTED);
-            discoverDevicesIntent.addAction(BluetoothDevice.ACTION_ACL_DISCONNECT_REQUESTED);
-            discoverDevicesIntent.addAction(BluetoothDevice.ACTION_ACL_DISCONNECTED);
-            registerReceiver(broadcastReceiverThird, discoverDevicesIntent);
+//            bluetoothAdapter.startDiscovery();
+//            IntentFilter discoverDevicesIntent = new IntentFilter(BluetoothDevice.ACTION_FOUND);
+//            discoverDevicesIntent.addAction(BluetoothDevice.ACTION_ACL_CONNECTED);
+//            discoverDevicesIntent.addAction(BluetoothDevice.ACTION_ACL_DISCONNECT_REQUESTED);
+//            discoverDevicesIntent.addAction(BluetoothDevice.ACTION_ACL_DISCONNECTED);
+//            registerReceiver(broadcastReceiverThird, discoverDevicesIntent);
         }
 
         if (!bluetoothAdapter.isDiscovering()) {
             checkPermissions();
 
             bluetoothAdapter.startDiscovery();
-            IntentFilter discoverDevicesIntent = new IntentFilter(BluetoothDevice.ACTION_FOUND);
-            registerReceiver(broadcastReceiverThird, discoverDevicesIntent);
+            IntentFilter filter = new IntentFilter(BluetoothDevice.ACTION_FOUND);
+            registerReceiver(mReceiver, filter); // Don't forget to unregister during onDestroy
+//            IntentFilter discoverDevicesIntent = new IntentFilter(BluetoothDevice.ACTION_FOUND);
+//            registerReceiver(broadcastReceiverThird, discoverDevicesIntent);
         }
     }
 
@@ -263,14 +287,16 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             Log.d(TAG, "Trying to pair with " + devices.get(i).getName());
             devices.get(i).createBond();
             mainDevice = devices.get(i);
-            connectionService = new ConnectionService(queue, this);
+            connectionService = new ConnectionService(queue, this, dataProvider);
         }
     }
 
     public void startBluetoothConnection(View view) {
         if (this.selected) {
             System.out.println("starting Client");
+
             connectionService.startClient(mainDevice);
+
         }
     }
 
@@ -284,7 +310,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     protected void onPause() {
 //        dataSender.kill();
-        dataProvider.kill();
+//        dataProvider.kill();
         super.onPause();
     }
 

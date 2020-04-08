@@ -4,7 +4,7 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetSocketAddress;
 
-import mk.meeskantje.meeskantjecontrol.data.bluetooth.ConnectionService;
+import mk.meeskantje.meeskantjecontrol.data.bluetooth.ConnectedThread;
 import mk.meeskantje.meeskantjecontrol.data.bluetooth.PacketQueue;
 
 public class UDPClient extends Thread {
@@ -12,15 +12,17 @@ public class UDPClient extends Thread {
     private String lastMessage = "";
     private  DatagramSocket socket = null;
     private PacketQueue queue;
+    private ConnectedThread connectedThread;
 
     public UDPClient(PacketQueue queue) {
         this.queue = queue;
+        this.connectedThread = null;
     }
 
     public void run() {
         System.out.println("Listener started");
         String message;
-        byte[] lMessage = new byte[256];
+        byte[] lMessage = new byte[255];
         DatagramPacket packet = new DatagramPacket(lMessage, lMessage.length);
 
         try {
@@ -33,12 +35,16 @@ public class UDPClient extends Thread {
             while(bKeepRunning) {
                 socket.receive(packet);
                 if (packet != null) {
-                    this.queue.addQueue(packet);
+
+                    if (connectedThread != null) {
+
+                        message = new String(lMessage, 0, packet.getLength());
+                        lastMessage = message;
+                        connectedThread.write(message.getBytes());
+                    }
                 }
 
-                message = new String(lMessage, 0, packet.getLength());
-                lastMessage = message;
-//                System.out.println(message);
+
             }
         } catch (Throwable e) {
             e.printStackTrace();
@@ -53,9 +59,7 @@ public class UDPClient extends Thread {
         bKeepRunning = false;
     }
 
-    public String getLastMessage() {
-        return lastMessage;
+    public void setConnectedThread(ConnectedThread connectedThread) {
+        this.connectedThread = connectedThread;
     }
-
-
 }
