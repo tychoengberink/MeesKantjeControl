@@ -17,6 +17,11 @@ public class UDPSender extends Thread {
 
     }
 
+    /**
+     * Sends a packet over UDP.
+     * @param packet DatagramPacket message.
+     * @throws IOException
+     */
     public void send(DatagramPacket packet) throws IOException {
         socket.send(packet);
     }

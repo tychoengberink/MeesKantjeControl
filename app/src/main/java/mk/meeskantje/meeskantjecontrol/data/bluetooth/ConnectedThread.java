@@ -44,7 +44,6 @@ public class ConnectedThread extends Thread {
 
         dataHandler.getReciever().setConnectedThread(this);
 
-
         // Keep looping to listen for received messages
         while (true) {
             try {
@@ -56,19 +55,19 @@ public class ConnectedThread extends Thread {
                     System.out.println("READED INCOMING BLUETOOTH DATA");
 
                     String readMessage = new String(buffer, 0, bytes);
-                    InetAddress addres = dataHandler.getAdress();
+                    InetAddress address = dataHandler.getAdress();
                     int port = 33333;
                     DatagramPacket packet = null;
                     byte[] buf = readMessage.getBytes();
 
-                    packet = new DatagramPacket(buf, buf.length, addres, port);
+                    packet = new DatagramPacket(buf, buf.length, address, port);
                     queue.addDownQueue(packet);
                     System.out.println("ADDED TO QUEUE SIZE = " + queue.getDownPackets().size());
                     Thread.currentThread().sleep(2000);
                 }
                 if (queue.getDownPackets().size() > 0) {
-                    DatagramPacket downpacket = queue.getNextDownPacket();
-                    dataHandler.send(downpacket);
+                    DatagramPacket downPacket = queue.getNextDownPacket();
+                    dataHandler.send(downPacket);
                     System.out.println("SENDED SIZE = " + queue.getDownPackets().size());
                 }
             } catch (IOException | InterruptedException e) {

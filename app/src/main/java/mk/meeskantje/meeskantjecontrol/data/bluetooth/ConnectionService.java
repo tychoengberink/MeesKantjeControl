@@ -21,7 +21,6 @@ public class ConnectionService {
     ProgressDialog dialog;
     Context context;
 
-
     public ConnectionService(PacketQueue queue, Context context, UDPSocket dataHandler) {
         this.context = context;
         this.mBlueToothAd = BluetoothAdapter.getDefaultAdapter();
@@ -30,7 +29,9 @@ public class ConnectionService {
         start();
     }
 
-
+    /**
+     * Starts the acceptThread.
+     */
     public synchronized void start() {
         if (mConnectThread != null) {
             mConnectThread.cancel();
@@ -43,6 +44,10 @@ public class ConnectionService {
         }
     }
 
+    /**
+     * Defines and starts a new ConnectThread.
+     * @param device the Bluetooth device.
+     */
     public void startClient(BluetoothDevice device) {
         dialog = ProgressDialog.show(context, "Connecting bluetooth", "Loading...", true);
 

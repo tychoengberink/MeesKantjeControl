@@ -94,6 +94,9 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         dataHandler = new UDPSocket(33333, queue);
     }
 
+    /**
+     * Turns bluetooth on or off.
+     */
     public void bluetoothSwitch() {
         if (bluetoothAdapter != null) {
             if (!bluetoothAdapter.isEnabled()) {
@@ -116,6 +119,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         }
     }
 
+    /**
+     * Starts searching for other bluetooth devices.
+     * @param view
+     */
     public void btnDiscover(View view) {
         Log.d(TAG, "Looking for devices.");
 

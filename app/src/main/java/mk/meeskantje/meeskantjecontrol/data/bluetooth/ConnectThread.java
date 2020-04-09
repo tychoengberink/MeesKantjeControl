@@ -56,6 +56,9 @@ public class ConnectThread extends Thread {
 
     }
 
+    /**
+     * Stops the thread.
+     */
     public void cancel() {
         try {
             this.connectSocket.close();

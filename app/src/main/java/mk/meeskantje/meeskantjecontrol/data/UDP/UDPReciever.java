@@ -20,6 +20,10 @@ public class UDPReciever extends Thread {
         this.socket = socket;
     }
 
+    /**
+     * Receives packets from UDP and puts them in the queue.
+     * When there are packets in the queue, it sends the next packet in queue over bluetooth.
+     */
     public void run() {
         System.out.println("Receiver started");
         String message;
@@ -63,6 +67,9 @@ public class UDPReciever extends Thread {
         }
     }
 
+    /**
+     * Stops the thread.
+     */
     public void kill() {
         bKeepRunning = false;
     }
