@@ -49,7 +49,7 @@ public class UDPSocket {
      * @throws UnknownHostException
      */
     public InetAddress getAdress() throws UnknownHostException {
-        return InetAddress.getByName("192.168.178.20");
+        return InetAddress.getByName("192.168.1.79");
     }
 
     /**
