@@ -61,7 +61,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     @Override
     protected void onDestroy() {
         super.onDestroy();
-
+        dataHandler.stop();
         unregisterReceiver(mReceiver);
     }
 
@@ -91,7 +91,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
                 bluetoothSwitch();
             }
         });
-
+        dataHandler = new UDPSocket(33333, queue);
     }
 
     public void bluetoothSwitch() {
@@ -164,25 +164,8 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
     public void startBluetoothConnection(View view) {
         if (this.selected) {
             System.out.println("starting Client");
-
             connectionService.startClient(mainDevice);
 
         }
-    }
-
-    protected void onResume() {
-        dataHandler = new UDPSocket(33333, queue);
-        super.onResume();
-    }
-
-    protected void onPause() {
-        dataHandler.stop();
-        super.onPause();
-    }
-
-    @Override
-    protected void onStop() {
-        dataHandler.stop();
-        super.onStop();
     }
 }

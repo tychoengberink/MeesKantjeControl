@@ -43,21 +43,35 @@ public class ConnectedThread extends Thread {
         }
 
         dataHandler.getReciever().setConnectedThread(this);
-        byte[] buffer = new byte[256];
-        int bytes;
+
 
         // Keep looping to listen for received messages
         while (true) {
             try {
-                bytes = mmInStream.read(buffer);            //read bytes from input buffer
-                String readMessage = new String(buffer, 0, bytes);
-                InetAddress addres = InetAddress.getByName("192.168.1.79");
-                int port = 33333;
-                DatagramPacket packet = null;
-                byte[] buf = readMessage.getBytes();
-                packet = new DatagramPacket(buf, buf.length, addres, port);
-                dataHandler.send(packet);
-            } catch (IOException e) {
+                if (mmSocket != null) {
+                    int bytes;
+                    byte[] buffer = new byte[255];
+
+                    bytes = mmInStream.read(buffer);
+                    System.out.println("READED INCOMING BLUETOOTH DATA");
+
+                    String readMessage = new String(buffer, 0, bytes);
+                    InetAddress addres = dataHandler.getAdress();
+                    int port = 33333;
+                    DatagramPacket packet = null;
+                    byte[] buf = readMessage.getBytes();
+
+                    packet = new DatagramPacket(buf, buf.length, addres, port);
+                    queue.addDownQueue(packet);
+                    System.out.println("ADDED TO QUEUE SIZE = " + queue.getDownPackets().size());
+                    Thread.currentThread().sleep(2000);
+                }
+                if (queue.getDownPackets().size() > 0) {
+                    DatagramPacket downpacket = queue.getNextDownPacket();
+                    dataHandler.send(downpacket);
+                    System.out.println("SENDED SIZE = " + queue.getDownPackets().size());
+                }
+            } catch (IOException | InterruptedException e) {
                 e.printStackTrace();
             }
         }

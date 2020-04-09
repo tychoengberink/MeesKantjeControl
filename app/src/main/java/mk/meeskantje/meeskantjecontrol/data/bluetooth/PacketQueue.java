@@ -9,6 +9,7 @@ public class PacketQueue {
 
     public PacketQueue() {
         this.packets = new ArrayList<>();
+        this.downPackets = new ArrayList<>();
     }
 
     public void addQueue(DatagramPacket packet) {
@@ -20,22 +21,12 @@ public class PacketQueue {
     }
 
     public DatagramPacket getNextPacket() {
-        DatagramPacket tmp = this.packets.get(0);
-        return tmp;
-    }
+        return packets.remove(0);
 
-
-    public void removeNextPacket() {
-        this.packets.remove(0);
     }
 
     public DatagramPacket getNextDownPacket() {
-        DatagramPacket tmp = this.downPackets.get(0);
-        return tmp;
-    }
-
-    public void removeNextDownPacket() {
-        this.downPackets.remove(0);
+        return downPackets.remove(0);
     }
 
     public int getQueueLength() {
