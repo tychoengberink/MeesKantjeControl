@@ -36,6 +36,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
 
     private static final String TAG = "MainActivity";
     public ArrayList<BluetoothDevice> devices;
+    public ArrayList<String> deviceAddresses;
     public DeviceListAdapter deviceListAdapter;
     private BluetoothAdapter bluetoothAdapter;
     private ConnectionService connectionService;
@@ -49,7 +50,10 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
             if (BluetoothDevice.ACTION_FOUND.equals(action)) {
                 // Get the BluetoothDevice object from the Intent
                 BluetoothDevice device = intent.getParcelableExtra(BluetoothDevice.EXTRA_DEVICE);
-                devices.add(device);
+                if (device.getAddress() != null && !deviceAddresses.contains(device.getAddress())) {
+                    devices.add(device);
+                    deviceAddresses.add(device.getAddress());
+                }
                 Log.d(TAG, "onReceiveThird: " + device.getName() + ": " + device.getAddress());
                 deviceListAdapter = new DeviceListAdapter(context, R.layout.device_adapter_view, devices);
                 deviceList.setAdapter(deviceListAdapter);
@@ -79,6 +83,7 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
         startButton = findViewById(R.id.start_connection);
 
         devices = new ArrayList<>();
+        deviceAddresses = new ArrayList<>();
         deviceList = findViewById(R.id.device_list);
 
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
@@ -125,8 +130,6 @@ public class MainActivity extends AppCompatActivity implements AdapterView.OnIte
      */
     public void btnDiscover(View view) {
         Log.d(TAG, "Looking for devices.");
-
-        this.devices.clear();
 
         if (bluetoothAdapter.isDiscovering()) {
             bluetoothAdapter.cancelDiscovery();
