@@ -21,6 +21,7 @@ public class ConnectionService {
     ProgressDialog dialog;
     Context context;
 
+
     public ConnectionService(PacketQueue queue, Context context, UDPSocket dataHandler) {
         this.context = context;
         this.mBlueToothAd = BluetoothAdapter.getDefaultAdapter();

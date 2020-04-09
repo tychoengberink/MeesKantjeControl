@@ -11,7 +11,7 @@ import mk.meeskantje.meeskantjecontrol.data.bluetooth.PacketQueue;
 
 public class UDPSocket {
     private UDPSender sender;
-    private UDPReciever receiver;
+    private UDPReciever reciever;
     private DatagramSocket socket;
 
     public UDPSocket(int port, PacketQueue queue) {
@@ -19,16 +19,16 @@ public class UDPSocket {
             this.socket = new DatagramSocket(port);
             this.socket.setSoTimeout(5000);
             this.sender = new UDPSender(socket);
-            this.receiver = new UDPReciever(queue, socket);
+            this.reciever = new UDPReciever(queue, socket);
             this.sender.start();
-            this.receiver.start();
+            this.reciever.start();
         } catch (SocketException e) {
             e.printStackTrace();
         }
     }
 
     public UDPReciever getReciever() {
-        return receiver;
+        return reciever;
     }
 
     /**
@@ -49,14 +49,14 @@ public class UDPSocket {
      * @throws UnknownHostException
      */
     public InetAddress getAdress() throws UnknownHostException {
-        return InetAddress.getByName("192.168.1.79");
+        return InetAddress.getByName("192.168.178.20");
     }
 
     /**
      * Stops the receiver and closes the socket.
      */
     public void stop() {
-        this.receiver.kill();
+        this.reciever.kill();
         this.socket.close();
     }
 
