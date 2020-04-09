@@ -29,17 +29,8 @@ public class PacketQueue {
         return downPackets.remove(0);
     }
 
-    public int getQueueLength() {
-        return this.packets.size();
-    }
-
     public ArrayList<DatagramPacket> getPackets() {
         return this.packets;
-    }
-
-
-    public int getQueueDownLength() {
-        return this.downPackets.size();
     }
 
     public ArrayList<DatagramPacket> getDownPackets() {

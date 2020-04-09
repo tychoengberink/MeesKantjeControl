@@ -21,7 +21,7 @@ public class UDPReciever extends Thread {
     }
 
     public void run() {
-        System.out.println("Reciever started");
+        System.out.println("Receiver started");
         String message;
         byte[] lMessage = new byte[255];
         DatagramPacket packet = new DatagramPacket(lMessage, lMessage.length);

@@ -11,7 +11,7 @@ import mk.meeskantje.meeskantjecontrol.data.bluetooth.PacketQueue;
 
 public class UDPSocket {
     private UDPSender sender;
-    private UDPReciever reciever;
+    private UDPReciever receiver;
     private DatagramSocket socket;
 
     public UDPSocket(int port, PacketQueue queue) {
@@ -19,16 +19,16 @@ public class UDPSocket {
             this.socket = new DatagramSocket(port);
             this.socket.setSoTimeout(5000);
             this.sender = new UDPSender(socket);
-            this.reciever = new UDPReciever(queue, socket);
+            this.receiver = new UDPReciever(queue, socket);
             this.sender.start();
-            this.reciever.start();
+            this.receiver.start();
         } catch (SocketException e) {
             e.printStackTrace();
         }
     }
 
     public UDPReciever getReciever() {
-        return reciever;
+        return receiver;
     }
 
     public void send(DatagramPacket out) {
@@ -44,7 +44,7 @@ public class UDPSocket {
     }
 
     public void stop() {
-        this.reciever.kill();
+        this.receiver.kill();
         this.socket.close();
     }
 

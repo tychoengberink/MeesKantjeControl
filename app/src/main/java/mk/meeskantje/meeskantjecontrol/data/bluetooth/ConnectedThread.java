@@ -94,8 +94,4 @@ public class ConnectedThread extends Thread {
             e.printStackTrace();
         }
     }
-
-    public InputStream getMmInStream() {
-        return mmInStream;
-    }
 }

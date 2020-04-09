@@ -63,8 +63,4 @@ public class ConnectThread extends Thread {
             e.printStackTrace();
         }
     }
-
-    public ConnectedThread getManageMyConnectedSocket() {
-        return manageMyConnectedSocket;
-    }
 }
