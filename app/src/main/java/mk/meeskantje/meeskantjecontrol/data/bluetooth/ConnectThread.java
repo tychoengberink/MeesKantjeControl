@@ -11,7 +11,6 @@ import java.util.UUID;
 import mk.meeskantje.meeskantjecontrol.data.UDP.UDPSocket;
 
 public class ConnectThread extends Thread {
-    private static final String TAG = "BluetoothService";
     private BluetoothSocket connectSocket;
     private BluetoothDevice device;
     private ConnectedThread manageMyConnectedSocket;

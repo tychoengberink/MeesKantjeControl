@@ -12,7 +12,6 @@ import mk.meeskantje.meeskantjecontrol.data.UDP.UDPSocket;
 public class ConnectionService {
     private PacketQueue queue;
     private static final UUID DEFAULT_SPP_UUID = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb");
-    private boolean paused;
     private final BluetoothAdapter mBlueToothAd;
     private ConnectThread mConnectThread;
     private AcceptThread mAcceptThread;
