@@ -65,6 +65,9 @@ public class AcceptThread extends Thread {
         }
     }
 
+    /**
+     * stops the thread.
+     */
     public void cancel() {
         if (mmServerSocket != null) {
             try {

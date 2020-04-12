@@ -12,7 +12,6 @@ import mk.meeskantje.meeskantjecontrol.data.UDP.UDPSocket;
 public class ConnectionService {
     private PacketQueue queue;
     private static final UUID DEFAULT_SPP_UUID = UUID.fromString("00001101-0000-1000-8000-00805f9b34fb");
-    private boolean paused;
     private final BluetoothAdapter mBlueToothAd;
     private ConnectThread mConnectThread;
     private AcceptThread mAcceptThread;
@@ -30,7 +29,9 @@ public class ConnectionService {
         start();
     }
 
-
+    /**
+     * Starts the acceptThread.
+     */
     public synchronized void start() {
         if (mConnectThread != null) {
             mConnectThread.cancel();
@@ -43,6 +44,10 @@ public class ConnectionService {
         }
     }
 
+    /**
+     * Defines and starts a new ConnectThread.
+     * @param device the Bluetooth device.
+     */
     public void startClient(BluetoothDevice device) {
         dialog = ProgressDialog.show(context, "Connecting bluetooth", "Loading...", true);
 

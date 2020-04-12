@@ -53,7 +53,7 @@ public class ConnectedThread extends Thread {
                     byte[] buffer = new byte[255];
 
                     bytes = mmInStream.read(buffer);
-                    System.out.println("READED INCOMING BLUETOOTH DATA");
+                    System.out.println("READ INCOMING BLUETOOTH DATA");
 
                     String readMessage = new String(buffer, 0, bytes);
                     InetAddress addres = dataHandler.getAdress();
@@ -69,7 +69,7 @@ public class ConnectedThread extends Thread {
                 if (queue.getDownPackets().size() > 0) {
                     DatagramPacket downpacket = queue.getNextDownPacket();
                     dataHandler.send(downpacket);
-                    System.out.println("SENDED SIZE = " + queue.getDownPackets().size());
+                    System.out.println("SEND SIZE = " + queue.getDownPackets().size());
                 }
             } catch (IOException | InterruptedException e) {
                 e.printStackTrace();
@@ -93,9 +93,5 @@ public class ConnectedThread extends Thread {
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }
-
-    public InputStream getMmInStream() {
-        return mmInStream;
     }
 }
